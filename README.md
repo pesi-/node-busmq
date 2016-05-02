@@ -252,10 +252,10 @@ Server endpoint:
 ```javascript
 bus.on('online', function() {
   var c = bus.channel('bar'); // use default names for the endpoints
-  c.on('connected', function() {
+  c.on('connect', function() {
     // connected to the channel
   });
-  c.on('remote:connected', function() {
+  c.on('remote:connect', function() {
     // the client is connected to the channel
     c.send('hello client!');
   });
@@ -271,10 +271,10 @@ Client endpoint:
 ```javascript
 bus.on('online', function() {
   var c = bus.channel('bar'); // use default names for the endpoints
-  c.on('connected', function() {
+  c.on('connect', function() {
     // connected to the channel
   });
-  c.on('remote:connected', function() {
+  c.on('remote:connect', function() {
     // the server is connected to the channel
     c.send('hello server!');
   });
@@ -293,10 +293,10 @@ Server endpoint:
 bus.on('online', function() {
   // local role is server, remote role is client
   var c = bus.channel('zoo', 'server', 'client');
-  c.on('connected', function() {
+  c.on('connect', function() {
     // connected to the channel
   });
-  c.on('remote:connected', function() {
+  c.on('remote:connect', function() {
     // the client is connected to the channel
     c.send('hello client!');
   });
@@ -314,10 +314,10 @@ bus.on('online', function() {
   // notice the reverse order of roles
   // local role is client, remote role is server
   var c = bus.channel('zoo', 'client', 'server');
-  c.on('connected', function() {
+  c.on('connect', function() {
     // connected to the channel
   });
-  c.on('remote:connected', function() {
+  c.on('remote:connect', function() {
     // the server is connected to the channel
     c.send('hello server!');
   });
