@@ -5,6 +5,7 @@
 
 var http = require('http');
 var crypto = require('crypto');
+var _url = require('url');
 var Bus = require('../lib/bus');
 var tf = require('./test.functions');
 var RedisSentinels = require('./helpers/redis-sentinels');
@@ -279,6 +280,26 @@ describe('BusMQ sentinels', function() {
     it('does not allow federation with wrong secret', function(done) {
       var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: redisUrls, federate: {server: fedserver, secret: 'thisisit'}, logger: console});
       tf.fedNotWithWrongSecret(bus, done, fedBusCreator);
+    });
+
+    it('allows federation with custom secret function', function(done) {
+      var custom = {};
+      var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: redisUrls, federate: {server: fedserver, secret: function(info) {
+        custom.called = true;
+        var parsed = _url.parse(info.req.url, true);
+        return parsed.query && (parsed.query.secret === 'mycustomsecretfunction');
+      }}, logger: console});
+      tf.fedWithCustomSecretFunction(bus, done, fedBusCreator, custom);
+    });
+
+    it('does not allow federation with custom secret function', function(done) {
+      var custom = {};
+      var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: redisUrls, federate: {server: fedserver, secret: function(info) {
+        custom.called = true;
+        var parsed = _url.parse(info.req.url, true);
+        return parsed.query && (parsed.query.secret === 'mycustomsecretfunction');
+      }}, logger: console});
+      tf.fedNotWithCustomSecretFunction(bus, done, fedBusCreator, custom);
     });
 
     it('produces and consumes 10 messages in 10 queues over federation', function(done) {

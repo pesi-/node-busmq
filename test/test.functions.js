@@ -1750,6 +1750,86 @@ function fedNotWithWrongSecret(bus, done, fedBusCreator) {
   bus.connect();
 }
 
+function fedWithCustomSecretFunction(bus, done, fedBusCreator, custom) {
+  bus.on('error', function(err) {
+    done && done(err);
+    done = null;
+  });
+  bus.on('online', function() {
+    // create a second bus to federate requests
+    var busFed = fedBusCreator({urls: ['http://127.0.0.1:9777'], poolSize: 1, secret: 'mycustomsecretfunction' });
+    busFed.on('error', function(err) {
+      done && done(err);
+      done = null;
+    });
+    busFed.on('online', function() {
+      var name = 'q'+Date.now();
+      var f = busFed.federate(busFed.queue(name), 'http://127.0.0.1:9777');
+      f.on('error', function(err) {
+        done && done(err);
+        done = null;
+      });
+      f.on('unauthorized', function() {
+        done && done('should be authorized');
+        done = null;
+      });
+      f.on('ready', function() {
+        Should(custom.called).be.exactly(true);
+        busFed.disconnect();
+      });
+      f.on('close', function() {
+      });
+    });
+    busFed.on('offline', function() {
+      bus.disconnect();
+    });
+    busFed.connect();
+
+  });
+  bus.on('offline', function() {
+    done && done();
+    done = null;
+  });
+  bus.connect();
+}
+
+function fedNotWithCustomSecretFunction(bus, done, fedBusCreator, custom) {
+  bus.on('error', function(err) {
+    done(err);
+  });
+  bus.on('online', function() {
+    // create a second bus to federate requests
+    var busFed = fedBusCreator({urls: ['http://127.0.0.1:9777'], poolSize: 5, secret: 'thisisNOTmycustomsecret' });
+    busFed.on('error', function(err) {
+      done(err);
+    });
+    busFed.on('online', function() {
+      var name = 'q'+Date.now();
+      var f = busFed.federate(busFed.queue(name), 'http://127.0.0.1:9777');
+      f.on('error', done);
+      f.on('unauthorized', function() {
+        Should(custom.called).be.exactly(true);
+        busFed.disconnect();
+      });
+      f.on('ready', function() {
+        done('ready should not have been called')
+      });
+      f.on('close', function() {
+      });
+    });
+    busFed.on('offline', function() {
+      bus.disconnect();
+    });
+    busFed.connect();
+
+  });
+  bus.on('offline', function() {
+    done();
+  });
+  bus.connect();
+}
+
+
 function produceAndConsumeOverFederation(pBus, cBus, fedTo, messages, queues, cb) {
   function qDone() {
     if (--queues === 0) {
@@ -1965,6 +2045,8 @@ exports = module.exports = {
   fedWebsocketQueueClosesReopens: fedWebsocketQueueClosesReopens,
   fedWebsocketChannelClosesReopens: fedWebsocketChannelClosesReopens,
   fedNotWithWrongSecret: fedNotWithWrongSecret,
+  fedWithCustomSecretFunction: fedWithCustomSecretFunction,
+  fedNotWithCustomSecretFunction: fedNotWithCustomSecretFunction,
   testManyMessagesOverFederation: testManyMessagesOverFederation,
   testManySavesAndLoadesOverFederation: testManySavesAndLoadesOverFederation
 };
