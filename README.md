@@ -652,7 +652,9 @@ Create a new bus instance. Options:
   * `path` - the path within the server to accept federation requests on
   * `urls` - an array of urls of the form `http[s]://<ip-or-host>[:port]` of other bus instances that this bus can federate to. default is an empty array.
   * `poolSize` - the number of web sockets to keep open and idle at all times to federated bus instances. default is 10.
-  * `secret` - a secret key to be shared among all bus instances that can federate to each other. default is `notsosecret`.
+  * `secret` - String|Function. if a string, the secret key to be shared among all bus instances that can federate to each other. if a function,
+               the federver will call it to determine if the client is to be accepted (read more about the function
+               behavior at https://github.com/websockets/ws/blob/master/doc/ws.md#optionsverifyclient). default is `notsosecret`.
 * `logger` - the logger that the bus should use
 * `logLevel` - specify the bus log level. possible values are 'error', 'warning', 'info', 'debug'. default is 'error'
 
