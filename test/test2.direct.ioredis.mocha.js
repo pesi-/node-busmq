@@ -225,7 +225,7 @@ describe('BusMQ direct connectivity using ioredis', function() {
     function fedBusCreator(federate) {
       var options = {
         redis: redisUrls,
-        driver: 'node-redis',
+        driver: 'ioredis',
         logger: console,
         layout: 'direct',
         federate: federate
@@ -257,12 +257,10 @@ describe('BusMQ direct connectivity using ioredis', function() {
       var fedserver = http.createServer();
       fedserver.listen(9778, function() {
         var bus = Bus.create({driver: 'ioredis', redis: redisUrls, federate: {server: fedserver, path: '/federate'}, logger: console});
-        tf.fedWebsocketQueueClosesReopens(bus, fedBusCreator, fedserver, 9778, function() {
-          fedserver.on('error', function() {}); // ignore socket errors at this point
-          bus.options.federate.server.on('error', function() {}); // ignore socket errors at this point
+        tf.fedWebsocketQueueClosesReopens(bus, fedBusCreator, fedserver, 9778, function(err, fedserver) {
+          fedserver.close();
           setTimeout(function() {
-            //fedserver && fedserver.close();
-            done();
+            done(err);
           }, 100);
         });
       });
@@ -272,12 +270,10 @@ describe('BusMQ direct connectivity using ioredis', function() {
       var fedserver = http.createServer();
       fedserver.listen(9779, function() {
         var bus = Bus.create({driver: 'ioredis', redis: redisUrls, federate: {server: fedserver, path: '/federate'}, logger: console});
-        tf.fedWebsocketChannelClosesReopens(bus, fedBusCreator, fedserver, 9779, function() {
-          fedserver.on('error', function() {}); // ignore socket errors at this point
-          bus.options.federate.server.on('error', function() {}); // ignore socket errors at this point
+        tf.fedWebsocketChannelClosesReopens(bus, fedBusCreator, fedserver, 9779, function(err, fedserver) {
+          fedserver.close();
           setTimeout(function() {
-            //fedserver && fedserver.close();
-            done();
+            done(err);
           }, 100);
         });
       });

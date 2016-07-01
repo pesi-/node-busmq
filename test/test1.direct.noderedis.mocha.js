@@ -255,12 +255,10 @@ describe('BusMQ direct connectivity using node-redis', function() {
       var fedserver = http.createServer();
       fedserver.listen(9768, function() {
         var bus = Bus.create({redis: redisUrls, federate: {server: fedserver, path: '/federate'}, logger: console});
-        tf.fedWebsocketQueueClosesReopens(bus, fedBusCreator, fedserver, 9768, function() {
-          fedserver.on('error', function() {}); // ignore socket errors at this point
-          bus.options.federate.server.on('error', function() {}); // ignore socket errors at this point
+        tf.fedWebsocketQueueClosesReopens(bus, fedBusCreator, fedserver, 9768, function(err, fedserver) {
+          fedserver.close();
           setTimeout(function() {
-            //bus.options.federate.server && bus.options.federate.server.close();
-            done();
+            done(err);
           }, 100);
         });
       });
@@ -270,12 +268,10 @@ describe('BusMQ direct connectivity using node-redis', function() {
       var fedserver = http.createServer();
       fedserver.listen(9769, function() {
         var bus = Bus.create({redis: redisUrls, federate: {server: fedserver, path: '/federate'}, logger: console});
-        tf.fedWebsocketChannelClosesReopens(bus, fedBusCreator, fedserver, 9769, function() {
-          fedserver.on('error', function() {}); // ignore socket errors at this point
-          bus.options.federate.server.on('error', function() {}); // ignore socket errors at this point
+        tf.fedWebsocketChannelClosesReopens(bus, fedBusCreator, fedserver, 9769, function(err, fedserver) {
+          fedserver.close();
           setTimeout(function() {
-            //bus.options.federate.server && bus.options.federate.server.close();
-            done();
+            done(err);
           }, 100);
         });
       });

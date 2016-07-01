@@ -251,12 +251,10 @@ describe('BusMQ sentinels', function() {
       var fedserver = http.createServer();
       fedserver.listen(9758, function() {
         var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: redisUrls, federate: {server: fedserver, path: '/federate'}, logger: console});
-        tf.fedWebsocketQueueClosesReopens(bus, fedBusCreator, fedserver, 9758, function() {
-          fedserver.on('error', function() {}); // ignore socket errors at this point
-          bus.options.federate.server.on('error', function() {}); // ignore socket errors at this point
+        tf.fedWebsocketQueueClosesReopens(bus, fedBusCreator, fedserver, 9758, function(err, fedserver) {
+          fedserver.close();
           setTimeout(function() {
-            //fedserver && fedserver.close();
-            done();
+            done(err);
           }, 100);
         });
       });
@@ -266,12 +264,10 @@ describe('BusMQ sentinels', function() {
       var fedserver = http.createServer();
       fedserver.listen(9759, function() {
         var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: redisUrls, federate: {server: fedserver, path: '/federate'}, logger: console});
-        tf.fedWebsocketChannelClosesReopens(bus, fedBusCreator, fedserver, 9759, function() {
-          fedserver.on('error', function() {}); // ignore socket errors at this point
-          bus.options.federate.server.on('error', function() {}); // ignore socket errors at this point
+        tf.fedWebsocketChannelClosesReopens(bus, fedBusCreator, fedserver, 9759, function(err, fedserver) {
+          fedserver.close();
           setTimeout(function() {
-            //fedserver && fedserver.close();
-            done();
+            done(err);
           }, 100);
         });
       });

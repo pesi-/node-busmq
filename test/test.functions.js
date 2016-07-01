@@ -1624,7 +1624,7 @@ function fedWebsocketQueueClosesReopens(bus, fedBusCreator, fedserver, port, don
     busFed.connect();
   });
   bus.on('offline', function() {
-    done();
+    done(undefined, fedserver);
   });
   bus.connect(); 
 }
@@ -1710,7 +1710,7 @@ function fedWebsocketChannelClosesReopens(bus, fedBusCreator, fedserver, port, d
     busFed.connect();
   });
   bus.on('offline', function() {
-    done();
+    done(undefined, fedserver);
   });
   bus.connect();  
 }

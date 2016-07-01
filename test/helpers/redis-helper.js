@@ -36,17 +36,21 @@ RedisHelper.prototype.open = function(args, done) {
     switch (k) {
       case 'alreadyinuse':
         _this.isOpening = false;
-        return _this.emit('error', 'Address already in use');
+        return _this.emit('error', _this.process.pid + ': Address already in use');
 
       case 'denied':
         _this.isOpening = false;
-        return _this.emit('error', 'Permission denied');
+        return _this.emit('error', _this.process.pid + ': Permission denied');
 
       case 'error':
+        _this.isOpening = false;
+        console.log('<==== Redis pid: '+_this.process.pid+'\n'+value.toString()+'\n');
+        return _this.emit('error', _this.process.pid + ': An error occurred');
+
       case 'notlisten':
         _this.isOpening = false;
         console.log('<==== Redis pid: '+_this.process.pid+'\n'+value.toString()+'\n');
-        return _this.emit('error', 'Invalid port number');
+        return _this.emit('error', _this.process.pid + ': Invalid port number');
 
       case 'serverisnowready':
       case 'sentinelrunid':
@@ -67,7 +71,7 @@ RedisHelper.prototype.open = function(args, done) {
   }
 
   function onData(data) {
-    //console.log('<==== Redis pid: '+_this.process.pid+'\n'+data.toString()+'\n');
+    // console.log('<==== Redis pid: '+_this.process.pid+'\n'+data.toString()+'\n');
     var matches = data.toString().match(keyRE);
     if (matches !== null) {
       matches.forEach(parse);
@@ -75,11 +79,13 @@ RedisHelper.prototype.open = function(args, done) {
   }
 
   function onError(err) {
-    done(new Error(err));
+    done && done(new Error(err));
+    done = null;
   }
 
   function onReady() {
-    done(null, _this);
+    done && done(null, _this);
+    done = null;
   }
 
   this.on('error', onError);
