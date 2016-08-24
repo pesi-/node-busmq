@@ -120,23 +120,25 @@ RedisSentinels.prototype.start = function(done) {
 RedisSentinels.prototype.stop = function(done) {
   var stopped = 0;
   var _this = this;
-  ['master', 'slave1','slave2','sentinel1','sentinel2','sentinel3'].forEach(function(r) {
-    if (_this.redises[r]) {
-      _this.redises[r].close( function () {
-        delete _this.redises[r];
-        /* ignore errors */
-        if ( ++stopped === 6 ) {
-          _this.redises = {};
-          done && done()
-        }
-      } );
-    }
-    else {
-      //partial start
-      _this.redises = {};
-      done && done();
-    }
-  });
+  setTimeout(function() {
+    ['master', 'slave1','slave2','sentinel1','sentinel2','sentinel3'].forEach(function(r) {
+      if (_this.redises[r]) {
+        _this.redises[r].close( function () {
+          delete _this.redises[r];
+          /* ignore errors */
+          if ( ++stopped === 6 ) {
+            _this.redises = {};
+            done && done();
+          }
+        } );
+      }
+      else {
+        //partial start
+        _this.redises = {};
+        done && done();
+      }
+    });
+  }, 200);
 };
 
 exports = module.exports = RedisSentinels;

@@ -108,25 +108,26 @@ RedisCluster.prototype.stop = function(done) {
   var index = 0;
 
   function stopNext( index ) {
-    var redis = _this.redises['700'+index];
-    if ( redis ) {
-      redis.close( function () {
-        delete _this.redises['700'+index];
-        /* ignore errors */
-        if ( index === 5 ) {
-          _this.redises = {};
-          console.log('--cluster stopped');
-          done && done();
-          return;
-        }
-        stopNext( index + 1 );
-      } );
-    }
-    else {
-      //partial start
-      console.log('--cluster hopefully stopped');
-      done && done();
-    }
+    setTimeout(function() {
+      var redis = _this.redises['700'+index];
+      if ( redis ) {
+        redis.close( function () {
+          delete _this.redises['700'+index];
+          /* ignore errors */
+          if ( index === 5 ) {
+            _this.redises = {};
+            console.log('--cluster stopped');
+              done && done();
+            return;
+          }
+          stopNext( index + 1 );
+        } );
+      } else {
+        //partial start
+        console.log('--cluster hopefully stopped');
+        done && done();
+      }
+    }, 100);
   }
   stopNext( index );
 };
