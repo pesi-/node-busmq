@@ -1,9 +1,9 @@
-
+var crypto = window.crypto || window.msCrypto;
 module.exports = {
   randomBytes: function(size) {
     size = size * 2;
     var array = new Uint8Array(size);
-    window.crypto.getRandomValues(array);
+    crypto.getRandomValues(array);
 
     array.toString = function(enc) {
       if (enc === 'hex') {
