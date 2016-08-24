@@ -15,13 +15,15 @@ function RedisGroup(ports, auths) {
 function stopRedis(args, done) {
   var redis = this.redises[args];
   var _this = this;
-  if (typeof redis === 'undefined') {
-    done();
-  }
-  redis.close(function() {
-    delete _this.redises[args];
-    done();
-  });
+  setTimeout(function() {
+    if (typeof redis === 'undefined') {
+      done();
+    }
+    redis.close(function() {
+      delete _this.redises[args];
+      done();
+    });
+  }, 100);
 }
 
 
