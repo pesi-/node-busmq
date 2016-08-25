@@ -138,7 +138,7 @@ RedisSentinels.prototype.stop = function(done) {
         done && done();
       }
     });
-  }, 200);
+  }, 2000);
 };
 
 exports = module.exports = RedisSentinels;

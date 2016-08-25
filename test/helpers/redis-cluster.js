@@ -127,7 +127,7 @@ RedisCluster.prototype.stop = function(done) {
         console.log('--cluster hopefully stopped');
         done && done();
       }
-    }, 100);
+    }, 2000);
   }
   stopNext( index );
 };

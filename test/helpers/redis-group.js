@@ -23,7 +23,7 @@ function stopRedis(args, done) {
       delete _this.redises[args];
       done();
     });
-  }, 100);
+  }, 2000);
 }
 
 
