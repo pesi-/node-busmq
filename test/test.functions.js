@@ -8,7 +8,7 @@ var http = require('http');
 //
 //////////////////////////////////////////////
 
-function onlineOffline(bus,done) {
+module.exports.onlineOffline = function(bus,done) {
   bus.on('error', function(err) {
     done(err);
   });
@@ -21,7 +21,7 @@ function onlineOffline(bus,done) {
   bus.connect();
 }
 
-function connectTwice(bus,done, duplicatePort) {
+module.exports.connectTwice = function(bus,done, duplicatePort) {
   var dones = 0;
   var onlines = 0;
   bus.on( 'error', function ( err ) {
@@ -48,7 +48,7 @@ function connectTwice(bus,done, duplicatePort) {
   bus.connect();
 }
 
-function downAndBack(bus, redisLayout, done) {
+module.exports.downAndBack = function(bus, redisLayout, done) {
   var onlines = 0;
   var offlines = 0;
   var allStopped= false;
@@ -86,7 +86,7 @@ function downAndBack(bus, redisLayout, done) {
   bus.connect();
 }
 
-function resumeSilently(bus, redisGroup, slavePort, masterPort, done) {
+module.exports.resumeSilently = function(bus, redisGroup, slavePort, masterPort, done) {
   var online = 0;
   var offline = 0;
   bus.on('error', function(){});
@@ -123,7 +123,7 @@ function resumeSilently(bus, redisGroup, slavePort, masterPort, done) {
 //
 //////////////////////////////////////////////
 
-function attachDetachEvents(bus, done) {
+module.exports.attachDetachEvents = function(bus, done) {
   var count = 0;
   function _count() {
     ++count;
@@ -165,7 +165,7 @@ function attachDetachEvents(bus, done) {
   bus.connect();
 }
 
-function pAttachPPushCAttachCReceive(bus,done) {
+module.exports.pAttachPPushCAttachCReceive = function(bus,done) {
 
     var testMessage = 'test message';
     var consumed = 0;
@@ -210,7 +210,7 @@ function pAttachPPushCAttachCReceive(bus,done) {
     bus.connect();
 }
 
-function pAttachCAttachPPushCReceive(bus,done) {
+module.exports.pAttachCAttachPPushCReceive = function(bus,done) {
   var testMessage = 'test message';
   var consumed = 0;
 
@@ -249,7 +249,7 @@ function pAttachCAttachPPushCReceive(bus,done) {
   bus.connect();
 }
 
-function cAttachPAttachPPUshCReceive(bus,done) {
+module.exports.cAttachPAttachPPUshCReceive = function(bus,done) {
   var testMessage = 'test message';
   var consumed = 0;
 
@@ -291,7 +291,7 @@ function cAttachPAttachPPUshCReceive(bus,done) {
   bus.connect();
 }
 
-function pAttachPPush5CAttachCReceive5(bus,done) {
+module.exports.pAttachPPush5CAttachCReceive5 = function(bus,done) {
   var testMessage = 'test message';
   var consumed = 0;
 
@@ -335,7 +335,7 @@ function pAttachPPush5CAttachCReceive5(bus,done) {
   bus.connect();
 }
 
-function pPUsh5PAttachCAttachCReceive5(bus,done) {
+module.exports.pPUsh5PAttachCAttachCReceive5 = function(bus,done) {
   var testMessage = 'test message';
   var consumed = 0;
 
@@ -377,7 +377,7 @@ function pPUsh5PAttachCAttachCReceive5(bus,done) {
   bus.connect();
 }
 
-function doNotExpireBeforeTTL(bus, done) {
+module.exports.doNotExpireBeforeTTL = function(bus, done) {
   var testMessage = 'test message';
 
   bus.on('error', done);
@@ -417,7 +417,7 @@ function doNotExpireBeforeTTL(bus, done) {
   bus.connect();
 }
 
-function queueShouldExpire(bus,done) {
+module.exports.queueShouldExpire = function(bus,done) {
   var testMessage = 'test message';
 
   bus.on('error', done);
@@ -460,7 +460,41 @@ function queueShouldExpire(bus,done) {
   bus.connect();
 }
 
-function produceAndConsume(bus, messages, queues, cb) {
+module.exports.queueShouldBeFoundLocally = function(bus,done) {
+  bus.on('error', done);
+  bus.on('online', function() {
+    var qName = 'test'+Math.random();
+
+    var p = bus.queue(qName);
+    p.on('error', done);
+    p.on('attached', function() {
+      var c = bus.queue(qName);
+      c.on('error', done);
+      p.on('detached', function() {
+        // ttl is 1 second, so the queue must be expired after 1.5 seconds
+        setTimeout(function() {
+          c.find(function(err, location) {
+            Should(err).be.exactly(null);
+            Should(location).be.exactly(null);
+            bus.disconnect();
+          });
+        }, 1500);
+      });
+      c.find(function(err, location) {
+        Should(err).be.exactly(null);
+        location.should.be.exactly('local');
+      });
+      p.detach();
+    });
+    p.attach({ttl: 1});
+  });
+  bus.on('offline', function() {
+    done();
+  });
+  bus.connect();
+}
+
+module.exports.produceAndConsume = function(bus, messages, queues, cb) {
   function qDone() {
     if (--queues === 0) {
       cb();
@@ -511,12 +545,12 @@ function produceAndConsume(bus, messages, queues, cb) {
   }
 }
 
-function testManyMessages(bus, messages, queues, done) {
+module.exports.testManyMessages = function(bus, messages, queues, done) {
   
   bus.on('error', done);
   bus.on('online', function() {
     var time = process.hrtime();
-    produceAndConsume(bus, messages, queues, function(err) {
+    module.exports.produceAndConsume(bus, messages, queues, function(err) {
       if (err) {
         done(err);
         return;
@@ -532,7 +566,7 @@ function testManyMessages(bus, messages, queues, done) {
   bus.connect();
 }
 
-function queueConsumesMax(bus,done) {
+module.exports.queueConsumesMax = function(bus,done) {
   var testMessage = 'test message';
   var consumed = 0;
 
@@ -589,7 +623,7 @@ function queueConsumesMax(bus,done) {
   bus.connect();
 }
 
-function queueConsumeWithoutRemoving(bus,done) {
+module.exports.queueConsumeWithoutRemoving = function(bus,done) {
   var testMessage = 'test message';
   var consumed = 0;
 
@@ -648,7 +682,7 @@ function queueConsumeWithoutRemoving(bus,done) {
   bus.connect();
 }
 
-function queueCountAndFlush(bus,done) {
+module.exports.queueCountAndFlush = function(bus,done) {
   var testMessage = 'test message';
 
   bus.on('error', done);
@@ -701,7 +735,7 @@ function queueCountAndFlush(bus,done) {
   bus.connect();
 }
 
-function queueNotReceiveWhenStopped(bus,done) {
+module.exports.queueNotReceiveWhenStopped = function(bus,done) {
   var consumed = 0;
 
   bus.on('error', done);
@@ -746,7 +780,7 @@ function queueNotReceiveWhenStopped(bus,done) {
   bus.connect();
 }
 
-function queueConsumeReliable(bus,done){
+module.exports.queueConsumeReliable = function(bus,done){
   var consumed = 0;
 
   bus.on('error', done);
@@ -845,11 +879,15 @@ function queueConsumeReliable(bus,done){
   bus.connect();
 }
 
-function queueGetSetMatadata(bus,done){
+module.exports.queueGetSetMatadata = function(bus,done){
   var key1 = 'key1';
   var value1 = 'value1';
   var key2 = 'key2';
   var value2 = 'value2';
+  var key3 = 'key3';
+  var value3 = 'value3';
+  var key4 = 'key4';
+  var value4 = 'value4';
 
   bus.on('error', done);
   bus.on('online', function() {
@@ -866,7 +904,15 @@ function queueGetSetMatadata(bus,done){
             val1.should.be.exactly(value1);
             q.metadata(key2, function(err, val2) {
               val2.should.be.exactly(value2);
-              q.detach();
+              q.metadata({key3: value3, key4: value4}, function() {
+                q.metadata(function(err, values) {
+                  values[key1].should.be.exactly(value1);
+                  values[key2].should.be.exactly(value2);
+                  values[key3].should.be.exactly(value3);
+                  values[key4].should.be.exactly(value4);
+                  q.detach();
+                });
+              });
             });
           });
         });
@@ -886,7 +932,7 @@ function queueGetSetMatadata(bus,done){
 //
 //////////////////////////////////////////////
 
-function channelServerListensClientConnects(bus,done) {
+module.exports.channelServerListensClientConnects = function(bus,done) {
   var testMessage = 'test message';
   var sEvents = {'message': 0};
   var cEvents = {'message': 0};
@@ -958,7 +1004,7 @@ function channelServerListensClientConnects(bus,done) {
   bus.connect();
 }
 
-function channelClientConnectsServerListens(bus,done) {
+module.exports.channelClientConnectsServerListens = function(bus,done) {
   var testMessage = 'test message';
   var sEvents = {'message': 0};
   var cEvents = {'message': 0};
@@ -1030,7 +1076,7 @@ function channelClientConnectsServerListens(bus,done) {
   bus.connect();
 }
 
-function reliableChannel(bus,done) {
+module.exports.reliableChannel = function(bus,done) {
   var sEvents = {msg: 0};
   var cEvents = {msg: 0};
 
@@ -1124,7 +1170,7 @@ function reliableChannel(bus,done) {
 //
 //////////////////////////////////////////////
 
-function persistencySavesAndLoads(bus,done) {
+module.exports.persistencySavesAndLoads = function(bus,done) {
   bus.on('error', done);
   bus.on('online', function() {
     var object = bus.persistify('data1', {}, ['field1', 'field2', 'field3']);
@@ -1154,7 +1200,7 @@ function persistencySavesAndLoads(bus,done) {
   bus.connect();
 }
 
-function testManySavesAndLoades(bus, objects, done) {
+module.exports.testManySavesAndLoades = function(bus, objects, done) {
   bus.on('error', done);
   bus.on('online', function() {
     function _done() {
@@ -1204,7 +1250,7 @@ function testManySavesAndLoades(bus, objects, done) {
 //
 //////////////////////////////////////////////
 
-function pubSubSubscribeUnsubscribe(bus,done) {
+module.exports.pubSubSubscribeUnsubscribe = function(bus,done) {
 
   bus.on('error', done);
   bus.on('online', function() {
@@ -1266,7 +1312,7 @@ function pubSubSubscribeUnsubscribe(bus,done) {
 //
 //////////////////////////////////////////////
 
-function fedFederateQueueEvents(bus, done, fedBusCreator) {
+module.exports.fedFederateQueueEvents = function(bus, done, fedBusCreator) {
   const binaryMessage = new Buffer([1,2,3,4,5,6,101,102,0,150,151,200,0,201,202,203,241,245]).toString('utf8');
 
   bus.on('error', function(err) {
@@ -1331,7 +1377,7 @@ function fedFederateQueueEvents(bus, done, fedBusCreator) {
   bus.connect();
 }
 
-function fedFederateChannelEvents(bus, done, fedBusCreator) {
+module.exports.fedFederateChannelEvents = function(bus, done, fedBusCreator) {
 
   bus.on('error', function(err) {
     done(err);
@@ -1390,7 +1436,7 @@ function fedFederateChannelEvents(bus, done, fedBusCreator) {
   bus.connect();
 }
 
-function fedFederatePersistedObjects(bus, done, fedBusCreator){
+module.exports.fedFederatePersistedObjects = function(bus, done, fedBusCreator){
   bus.on('error', function(err) {
     done(err);
   });
@@ -1455,7 +1501,7 @@ function fedFederatePersistedObjects(bus, done, fedBusCreator){
   bus.connect();
 }
 
-function fedPubSubEvents(bus, done, fedBusCreator) {
+module.exports.fedPubSubEvents = function(bus, done, fedBusCreator) {
 
   bus.on('error', function(err) {
     done(err);
@@ -1539,7 +1585,7 @@ function fedPubSubEvents(bus, done, fedBusCreator) {
   bus.connect();
 }
 
-function fedWebsocketQueueClosesReopens(bus, fedBusCreator, fedserver, port, done) {
+module.exports.fedWebsocketQueueClosesReopens = function(bus, fedBusCreator, fedserver, port, done) {
   var bus2;
   
   bus.on('error', function(err) {
@@ -1629,7 +1675,7 @@ function fedWebsocketQueueClosesReopens(bus, fedBusCreator, fedserver, port, don
   bus.connect(); 
 }
 
-function fedWebsocketChannelClosesReopens(bus, fedBusCreator, fedserver, port, done) {
+module.exports.fedWebsocketChannelClosesReopens = function(bus, fedBusCreator, fedserver, port, done) {
   var bus2;
   bus.on('error', function(err) {
     done(err);
@@ -1715,7 +1761,7 @@ function fedWebsocketChannelClosesReopens(bus, fedBusCreator, fedserver, port, d
   bus.connect();  
 }
 
-function fedNotWithWrongSecret(bus, done, fedBusCreator) {
+module.exports.fedNotWithWrongSecret = function(bus, done, fedBusCreator) {
   bus.on('error', function(err) {
     done(err);
   });
@@ -1750,7 +1796,7 @@ function fedNotWithWrongSecret(bus, done, fedBusCreator) {
   bus.connect();
 }
 
-function fedWithCustomSecretFunction(bus, done, fedBusCreator, custom) {
+module.exports.fedWithCustomSecretFunction = function(bus, done, fedBusCreator, custom) {
   bus.on('error', function(err) {
     done && done(err);
     done = null;
@@ -1793,7 +1839,7 @@ function fedWithCustomSecretFunction(bus, done, fedBusCreator, custom) {
   bus.connect();
 }
 
-function fedNotWithCustomSecretFunction(bus, done, fedBusCreator, custom) {
+module.exports.fedNotWithCustomSecretFunction = function(bus, done, fedBusCreator, custom) {
   bus.on('error', function(err) {
     done(err);
   });
@@ -1830,7 +1876,7 @@ function fedNotWithCustomSecretFunction(bus, done, fedBusCreator, custom) {
 }
 
 
-function produceAndConsumeOverFederation(pBus, cBus, fedTo, messages, queues, cb) {
+module.exports.produceAndConsumeOverFederation = function(pBus, cBus, fedTo, messages, queues, cb) {
   function qDone() {
     if (--queues === 0) {
       cb();
@@ -1903,7 +1949,7 @@ function produceAndConsumeOverFederation(pBus, cBus, fedTo, messages, queues, cb
   }
 }
 
-function testManyMessagesOverFederation(bus, messages, queues, done, fedBusCreator) {
+module.exports.testManyMessagesOverFederation = function(bus, messages, queues, done, fedBusCreator) {
   bus.on('error', function(err) {
     done(err);
   });
@@ -1915,7 +1961,7 @@ function testManyMessagesOverFederation(bus, messages, queues, done, fedBusCreat
     });
     busFed.on('online', function() {
       var time = process.hrtime();
-      produceAndConsumeOverFederation(busFed, busFed, 'http://127.0.0.1:9777/federate', messages, queues, function(err) {
+      module.exports.produceAndConsumeOverFederation(busFed, busFed, 'http://127.0.0.1:9777/federate', messages, queues, function(err) {
         if (err) {
           done(err);
           return;
@@ -1937,7 +1983,7 @@ function testManyMessagesOverFederation(bus, messages, queues, done, fedBusCreat
   bus.connect();
 }
 
-function testManySavesAndLoadesOverFederation(bus, objects, done, fedBusCreator) {
+module.exports.testManySavesAndLoadesOverFederation = function(bus, objects, done, fedBusCreator) {
   var total = objects;
 
   bus.on('error', done);
@@ -2006,47 +2052,55 @@ function testManySavesAndLoadesOverFederation(bus, objects, done, fedBusCreator)
   bus.connect();
 }
 
+module.exports.fedFindsDiscoverableQueue = function(bus, done, fedBusCreator) {
 
-exports = module.exports = {
-  onlineOffline: onlineOffline,
-  connectTwice: connectTwice,
-  downAndBack: downAndBack,
-  resumeSilently: resumeSilently,
-  //queues
-  attachDetachEvents: attachDetachEvents,
-  pAttachPPushCAttachCReceive: pAttachPPushCAttachCReceive,
-  pAttachCAttachPPushCReceive: pAttachCAttachPPushCReceive,
-  cAttachPAttachPPUshCReceive: cAttachPAttachPPUshCReceive,
-  pAttachPPush5CAttachCReceive5: pAttachPPush5CAttachCReceive5,
-  pPUsh5PAttachCAttachCReceive5: pPUsh5PAttachCAttachCReceive5,
-  doNotExpireBeforeTTL: doNotExpireBeforeTTL,
-  queueShouldExpire: queueShouldExpire,
-  testManyMessages: testManyMessages,
-  queueConsumesMax: queueConsumesMax,
-  queueConsumeWithoutRemoving: queueConsumeWithoutRemoving,
-  queueCountAndFlush: queueCountAndFlush,
-  queueNotReceiveWhenStopped: queueNotReceiveWhenStopped,
-  queueConsumeReliable: queueConsumeReliable,
-  queueGetSetMatadata: queueGetSetMatadata,
-  //channels
-  channelServerListensClientConnects: channelServerListensClientConnects,
-  channelClientConnectsServerListens: channelClientConnectsServerListens,
-  reliableChannel: reliableChannel,
-  //persistency
-  persistencySavesAndLoads: persistencySavesAndLoads,
-  testManySavesAndLoades: testManySavesAndLoades,
-  //pubsub
-  pubSubSubscribeUnsubscribe: pubSubSubscribeUnsubscribe,
-  //federation
-  fedFederateQueueEvents: fedFederateQueueEvents,
-  fedFederateChannelEvents: fedFederateChannelEvents,
-  fedFederatePersistedObjects: fedFederatePersistedObjects,
-  fedPubSubEvents: fedPubSubEvents,
-  fedWebsocketQueueClosesReopens: fedWebsocketQueueClosesReopens,
-  fedWebsocketChannelClosesReopens: fedWebsocketChannelClosesReopens,
-  fedNotWithWrongSecret: fedNotWithWrongSecret,
-  fedWithCustomSecretFunction: fedWithCustomSecretFunction,
-  fedNotWithCustomSecretFunction: fedNotWithCustomSecretFunction,
-  testManyMessagesOverFederation: testManyMessagesOverFederation,
-  testManySavesAndLoadesOverFederation: testManySavesAndLoadesOverFederation
-};
+  bus.on('error', function(err) {
+    done(err);
+  });
+  bus.on('online', function() {
+    // create a second bus to federate requests
+    var busFed = fedBusCreator({urls: ['http://127.0.0.1:9777/federate'], poolSize: 5 });
+    busFed.on('error', function(err) {
+      done(err);
+    });
+    busFed.on('federating', function(url) {
+      url.should.be.exactly('http://127.0.0.1:9777/federate');
+      var name = 'q'+Date.now();
+      // create local q
+      var qLocal = bus.queue(name);
+      qLocal.on('attached', function() {
+        // find the queue in the federating bus
+        // allow 10 ms for the announcement of the queue to reach the federating bus
+        // and then look for it
+        setTimeout(function() {
+          var qToFind = busFed.queue(name);
+          qToFind.find(function(err, location) {
+            Should(err).be.exactly(null);
+            Should(location).be.exactly('http://127.0.0.1:9777/federate');
+            qLocal.detach();
+          });
+        }, 10);
+      });
+      qLocal.on('detached', function() {
+        // the queue should no longer be found after the ttl
+        setTimeout(function() {
+          var qToFind2 = busFed.queue(name);
+          qToFind2.find(function(err, location) {
+            Should(err).be.exactly(null);
+            Should(location).be.exactly(null);
+            busFed.disconnect();
+          });
+        }, 1000); // ttl of 1 second
+      });
+      qLocal.attach({ttl: 1, discoverable: true});
+    });
+    busFed.on('offline', function() {
+      bus.disconnect();
+    });
+    busFed.connect();
+  });
+  bus.on('offline', function() {
+    done();
+  });
+  bus.connect();
+}

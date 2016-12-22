@@ -1,7 +1,8 @@
 var redisHelper = require('./redis-helper');
 var fs = require('fs');
 
-function RedisSentinels() {
+function RedisSentinels(port) {
+  this.port = port;
   this.redises= {};
 }
 
@@ -19,36 +20,36 @@ function deleteFolderRecursive(path) {
   }
 };
 
-function master(done) {
+function master(port, done) {
   var dir = __dirname+'/../tmp/sentinels/master';
   fs.mkdirSync(dir);
   fs.writeFileSync(dir+'/redis.conf',
-    'port 6279\n'+
+    'port ' + port + '\n'+
     'maxclients 200\n'+
     'dir '+dir
   );
   redisHelper.open([dir+'/redis.conf'],done);
 }
 
-function slave(num, done) {
+function slave(port, num, done) {
   var dir = __dirname+'/../tmp/sentinels/slave'+num;
   fs.mkdirSync(dir);
   fs.writeFileSync(dir+'/redis.conf',
-    'port '+(6279+num)+'\n'+
+    'port '+(port+num)+'\n'+
     'dir '+dir+'\n'+
-    'slaveof 127.0.0.1 6279\n'+
+    'slaveof 127.0.0.1 ' + port +'\n'+
     'maxclients 200'
   );
   redisHelper.open([dir+'/redis.conf'],done);
 }
 
-function sentinel(num, done){
+function sentinel(port, num, done){
   var dir = __dirname+'/../tmp/sentinels/sentinel'+num;
   fs.mkdirSync(dir);
   fs.writeFileSync(dir+'/redis.conf',
-    'port '+(26279+num-1)+'\n'+
+    'port '+(20000+port+num-1)+'\n'+
     'maxclients 200\n'+
-    'sentinel monitor mymaster 127.0.0.1 6279 2'+'\n'+
+    'sentinel monitor mymaster 127.0.0.1 ' + port + ' 2'+'\n'+
     'sentinel down-after-milliseconds mymaster 5000'+'\n'+
     'sentinel failover-timeout mymaster 60000'+'\n'+
     'sentinel config-epoch mymaster 3'+'\n'+
@@ -66,42 +67,42 @@ RedisSentinels.prototype.start = function(done) {
 
   var _this = this;
 
-  master(function(err, redis){
+  master(_this.port, function(err, redis){
     if (err) {
       _this.stop();
       done( err );
       return;
     }
     _this.redises['master'] = redis;
-    slave(1, function(err, redis){
+    slave(_this.port, 1, function(err, redis){
       if (err) {
         _this.stop();
         done( err );
         return;
       }
       _this.redises['slave1'] = redis;
-      slave(2, function(err, redis){
+      slave(_this.port, 2, function(err, redis){
         if (err) {
           _this.stop();
           done( err );
           return;
         }
         _this.redises['slave2'] = redis;
-        sentinel(1, function(err, redis){
+        sentinel(_this.port, 1, function(err, redis){
           if (err) {
             _this.stop();
             done( err );
             return;
           }
           _this.redises['sentinel1'] = redis;
-          sentinel(2, function(err, redis){
+          sentinel(_this.port, 2, function(err, redis){
             if (err) {
               _this.stop();
               done( err );
               return;
             }
             _this.redises['sentinel2'] = redis;
-            sentinel(3, function(err, redis){
+            sentinel(_this.port, 3, function(err, redis){
               if (err) {
                 _this.stop();
                 done( err );

@@ -27,7 +27,8 @@ function startRedisCluster(args, done) {
 }
 
 
-function RedisCluster() {
+function RedisCluster(port) {
+  this.port = port;
   this.redises= {};
 }
 
@@ -45,24 +46,24 @@ function deleteFolderRecursive(path) {
   }
 }
 
-function startInstance(index, done) {
-  var dir = __dirname+'/../tmp/cluster/700'+index;
+function startInstance(port, index, done) {
+  var dir = __dirname+'/../tmp/cluster'+port+'/'+(port+index);
   fs.mkdirSync(dir);
   fs.writeFileSync(dir+'/redis.conf',
-    'port 700'+index+'\n'+
-    'maxclients 200\n'+
-    'cluster-enabled yes'+'\n'+
-    'cluster-config-file nodes.conf'+'\n'+
-    'cluster-node-timeout 5000'+'\n'+
-    'appendonly yes'+'\n'+
-    'dir '+dir
+      'port '+(port+index)+'\n'+
+      'maxclients 200\n'+
+      'cluster-enabled yes'+'\n'+
+      'cluster-config-file nodes.conf'+'\n'+
+      'cluster-node-timeout 5000'+'\n'+
+      'appendonly yes'+'\n'+
+      'dir '+dir
   );
   redisHelper.open([dir+'/redis.conf'],done);
 }
 
-function initializeCluster(done) {
-  console.log('--Please wait, initializing cluster....');
-  startRedisCluster(['create', '--replicas', '1', '127.0.0.1:7000', '127.0.0.1:7001', '127.0.0.1:7002', '127.0.0.1:7003', '127.0.0.1:7004', '127.0.0.1:7005'], function(err) {
+function initializeCluster(port, done) {
+  console.log('--Please wait, initializing cluster on base port ' + port);
+  startRedisCluster(['create', '--replicas', '1', '127.0.0.1:'+port, '127.0.0.1:'+(port+1), '127.0.0.1:'+(port+2), '127.0.0.1:'+(port+3), '127.0.0.1:'+(port+4), '127.0.0.1:'+(port+5)], function(err) {
     if (err) {
       done && done(err);
       return;
@@ -77,26 +78,28 @@ function initializeCluster(done) {
 
 
 RedisCluster.prototype.start = function(done) {
-  if( !fs.existsSync(__dirname+'/../tmp') ) fs.mkdirSync(__dirname+'/../tmp');
+  if( !fs.existsSync(__dirname+'/../tmp') ) {
+    fs.mkdirSync(__dirname+'/../tmp');
+  }
   //cleanup
-  deleteFolderRecursive(__dirname+'/../tmp/cluster');
-  fs.mkdirSync(__dirname+'/../tmp/cluster');
+  deleteFolderRecursive(__dirname+'/../tmp/cluster'+this.port);
+  fs.mkdirSync(__dirname+'/../tmp/cluster'+this.port);
 
   var _this = this;
   var index = 0;
   function startNext(index) {
-    startInstance( index, function ( err, redis ) {
+    startInstance(_this.port, index, function ( err, redis ) {
       if ( err ) {
         _this.stop();
         done( err );
         return;
       }
-      _this.redises['700' + index] = redis;
+      _this.redises[(_this.port + index)] = redis;
       if ( index < 5 ) {
         startNext(index+1);
         return
       }
-      initializeCluster(done);
+      initializeCluster(_this.port, done);
     } );
   }
   startNext(index);
@@ -109,15 +112,15 @@ RedisCluster.prototype.stop = function(done) {
 
   function stopNext( index ) {
     setTimeout(function() {
-      var redis = _this.redises['700'+index];
+      var redis = _this.redises[(_this.port + index)];
       if ( redis ) {
         redis.close( function () {
-          delete _this.redises['700'+index];
+          delete _this.redises[(_this.port + index)];
           /* ignore errors */
           if ( index === 5 ) {
             _this.redises = {};
             console.log('--cluster stopped');
-              done && done();
+            done && done();
             return;
           }
           stopNext( index + 1 );

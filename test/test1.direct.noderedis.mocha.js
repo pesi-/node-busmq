@@ -66,6 +66,11 @@ describe('BusMQ direct connectivity using node-redis', function() {
       tf.attachDetachEvents(bus,done);
     });
 
+    it('queue should be found locally and not found after it expires', function(done) {
+      var bus = Bus.create({redis: redisUrls, logger: console});
+      tf.queueShouldBeFoundLocally(bus,done);
+    });
+
     describe('pushing and consuming messages', function() {
 
       it('producer attach -> producer push -> consumer attach -> consumer receive', function(done) {
@@ -220,9 +225,9 @@ describe('BusMQ direct connectivity using node-redis', function() {
       }, 100);
     });
 
-    function fedBusCreator(federate) {
+    function fedBusCreator(federate, redis) {
       var options = {
-        redis: redisUrls,
+        redis: redis || redisUrls,
         driver: 'node-redis',
         logger: console,
         layout: 'direct',
@@ -330,6 +335,13 @@ describe('BusMQ direct connectivity using node-redis', function() {
     it('persists 500 objects over federation', function(done) {
       var bus = Bus.create({redis: redisUrls, federate: {server: fedserver, path: '/federate'}, logger: console});
       tf.testManySavesAndLoadesOverFederation(bus, 500, done, fedBusCreator);
+    });
+
+    it('finds a discoverable queue', function(done) {
+      var bus = Bus.create({redis: redisUrls.slice(0,2), federate: {server: fedserver, path: '/federate'}, logger: console});
+      tf.fedFindsDiscoverableQueue(bus, done, function(federate) {
+        return fedBusCreator(federate, redisUrls.slice(2))
+      });
     });
 
   });

@@ -13,10 +13,12 @@ var RedisCluster = require('./helpers/redis-cluster');
 
 
 var redisUrls = ['redis://127.0.0.1:7000', 'redis://127.0.0.1:7001', 'redis://127.0.0.1:7002'];
+var redisUrls2 = ['redis://127.0.0.1:8000', 'redis://127.0.0.1:8001', 'redis://127.0.0.1:8002'];
 
 describe('BusMQ Cluster', function() {
 
-  var redisCluster = new RedisCluster();
+  var redisCluster = new RedisCluster(7000);
+  var redisCluster2 = new RedisCluster(8000);
 
   this.timeout(0);
   if (this.timeout() === 0) {
@@ -25,13 +27,15 @@ describe('BusMQ Cluster', function() {
 
   // start the redis servers
   before(function(done) {
-    redisCluster.start(done);
+    redisCluster.start(function() {
+      redisCluster2.start(done);
+    });
   });
 
   // stop all redis servers
   after(function(done) {
-    redisCluster.stop(function() {
-      done();
+    redisCluster2.stop(function() {
+      redisCluster.stop(done);
     });
   });
 
@@ -63,6 +67,11 @@ describe('BusMQ Cluster', function() {
     it('should receive attach/detach events', function(done) {
       var bus = Bus.create({driver: 'ioredis', layout: 'cluster', redis: redisUrls, logger: console});
       tf.attachDetachEvents(bus,done);
+    });
+
+    it('queue should be found locally and not found after it expires', function(done) {
+      var bus = Bus.create({driver: 'ioredis', layout: 'cluster', redis: redisUrls, logger: console});
+      tf.queueShouldBeFoundLocally(bus,done);
     });
 
     describe('pushing and consuming messages', function() {
@@ -219,9 +228,9 @@ describe('BusMQ Cluster', function() {
       }, 100);
     });
 
-    function fedBusCreator(federate) {
+    function fedBusCreator(federate, redis) {
       var options = {
-        redis: redisUrls,
+        redis: redis || redisUrls,
         driver: 'ioredis',
         logger: console,
         layout: 'cluster',
@@ -331,6 +340,12 @@ describe('BusMQ Cluster', function() {
       tf.testManySavesAndLoadesOverFederation(bus, 500, done, fedBusCreator);
     });
 
+    it('finds a discoverable queue', function(done) {
+      var bus = Bus.create({driver: 'ioredis', layout: 'cluster', redis: redisUrls, federate: {server: fedserver, path: '/federate'}, logger: console});
+      tf.fedFindsDiscoverableQueue(bus, done, function(federate) {
+        return fedBusCreator(federate, redisUrls2)
+      });
+    });
   });
 });
 
