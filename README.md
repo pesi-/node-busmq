@@ -5,18 +5,6 @@
 A high performance, highly available and scalable, message bus and queueing system for node.js.
 Message queues are backed by [Redis](http://redis.io/), a high performance, in-memory key/value store.
 
-### Important Note!
-
-*Version 1.0.0 introduces a breaking change* in the format of method callbacks. Event callbacks have not changed.
-
-Starting from version 1.0.0, all callbacks that receive a result of a method invocation (such as queue.push) now
-take an error as the first argument instead of the result.
-Previous busmq versions relied on the `error` event being fired on an object to specify the error instead of
-passing the error in context of the method invocation.
-
-This was done in order to better adhere to the node way of handling errors.
-Thanks to [ChiperSoft](https://github.com/ChiperSoft) for pointing this out!
-
 ### The Basics
 
 * Event based message queues
@@ -25,14 +13,14 @@ Thanks to [ChiperSoft](https://github.com/ChiperSoft) for pointing this out!
 * Publish/Subscribe channels
 * Persistent Publish/Subscribe (backed by message queues)
 * Federation over distributed data centers
+* Discoverable queues over federation
 * Auto expiration of queues after a pre-defined idle time
 * Scalability through the use of multiple redis instances and node processes
 * High availability through redis master-slave setup and stateless node processes
-* Tolerance to dynamic addition of redis instances during scale out
+* Tolerance to dynamic addition of redis instances
 * Choice of connection driver - [node_redis](https://github.com/NodeRedis/node_redis) or [ioredis](https://github.com/luin/ioredis) (thanks to [bgrieder](https://github.com/bgrieder))
 * Out-of-the-box support for Redis Sentinels and Clusters when using ioredis driver (thanks to [bgrieder](https://github.com/bgrieder))
-* Connect to the bus from a browser
-* Fast
+* Connect to the bus from a browser (via federation)
 
 ### Why Yet Another "Queue-Backed-by-Redis" Module?
 
@@ -66,10 +54,22 @@ stabilizes after the addition.
 High availability for redis is achieved by using standard redis high availability setups, such as
 [Redis Cluster](http://redis.io/topics/cluster-tutorial), [Redis Sentinal](http://redis.io/topics/sentinel) or [AWS ElasticCache](http://aws.amazon.com/elasticache/)
 
+### Important Note
+
+*Version 1.0.0 introduces a breaking change* in the format of method callbacks. Event callbacks have not changed.
+
+Starting from version 1.0.0, all callbacks that receive a result of a method invocation (such as queue.push) now
+take an error as the first argument instead of the result.
+Previous busmq versions relied on the `error` event being fired on an object to specify the error instead of
+passing the error in context of the method invocation.
+
+This was done in order to better adhere to the node way of handling errors.
+Thanks to [ChiperSoft](https://github.com/ChiperSoft) for pointing this out!
+
 ## Installation
 
 ```bash
-npm install busmq
+npm install --save busmq
 ```
 
 ## Bus
@@ -392,15 +392,14 @@ when building a bus that spans several data centers, where each data center is i
 
 Federation enables using queues, channels and persisted objects of a bus without access to the redis servers themselves.
 When federating an object, the federating bus uses web sockets to the target bus as the federation channel,
-and the target bus manages the object on its redis servers on behalf of the federating bus.
+and the federated bus manages the object on its redis servers on behalf of the federating bus.
 The federating bus does not host the federated objects on the local redis servers.
 
 Federation is done over web sockets since they are firewall and proxy friendly.
 
-The federating bus utilizes a simple pool of hot-connected web sockets. When a bus is initialized, it immediately
-spins up an fixed number of web sockets that connect to other bus instances. When federating an object, the bus
+The federating bus utilizes a simple pool of always-connected web sockets. When a bus is initialized, it
+spins up an fixed number of web sockets that connect to federated bus instances. When federating an object, the bus
 selects a web socket from the pool and starts federating the object over it.
-This behavior provides the best performance by eliminating the need to wait for the web socket to open when starting to federate.
 
 The API and events of a federated objects are exactly the same as a non-federated objects. This is achieved
 using the [dnode](https://github.com/substack/dnode) module for RPCing the object API.
@@ -436,7 +435,7 @@ var options = {
   federate: { // connect to a federate bus
     poolSize: 5, // keep the pool size with 5 web sockets
     urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url
-    secret: 'mysecret'  // the secret ket to authorize with the federation server
+    secret: 'mysecret'  // the secret key to authorize with the federation server
   }
 };
 var bus = Bus.create(options);
@@ -454,6 +453,32 @@ bus.on('online', function() {
 bus.connect();
 ```
 
+#### Finding a queue
+
+It is possible to find a queue that exists in a federated bus. 
+Note that a queue can only be found if the federated bus has announced its existence to the federating buses. 
+This is something that happens periodically during the lifecycle of the queue, where the announcement frequency  
+depends on the ttl of the queue (frequency is ttl/3)
+
+##### Making a queue discoverable
+```javascript
+ // a queue named 'foo' is created in the federated bus at http://192.168.0.1:8881 and is made discoverable
+ var queue = bus.queue('foo');
+ queue.attach({discoverable: true});
+```
+
+##### Finding the discoverable queue
+
+```javascript
+  // find the queue named 'foo'
+  var queue = bus.queue('foo');
+  queue.find(function(err, location) {
+    console.log(location === 'http://192.168.0.1:8881/my/fed/path'); // will print 'true'
+    // we can now federate the queue
+    var fed = bus.federate(queue, location);
+  });
+```
+
 #### Federating a channel
 
 ```javascript
@@ -462,7 +487,7 @@ var options = {
   federate: { // connect to a federate bus
     poolSize: 5, // keep the pool size with 5 web sockets
     urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url
-    secret: 'mysecret'  // the secret ket to authorize with the federation server
+    secret: 'mysecret'  // the secret key to authorize with the federation server
   }
 };
 var bus = Bus.create(options);
@@ -488,7 +513,7 @@ var options = {
   federate: { // connect to a federate bus
     poolSize: 5, // keep the pool size with 5 web sockets
     urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url
-    secret: 'mysecret'  // the secret ket to authorize with the federation server
+    secret: 'mysecret'  // the secret key to authorize with the federation server
   }
 };
 var bus = Bus.create(options);
@@ -738,6 +763,8 @@ Once attached, the `attached` event is emitted.
 Options:
 
 * `ttl` - duration in seconds for the queue to live without any attachments. default is 30 seconds.
+* `discoverable` - whether this queue should notify all the federating buses connected to this bus about this queue. 
+                   finding a discoverable queue is performed using the `Queue#find#` method. default is false.
 
 ##### queue#detach()
 
@@ -799,9 +826,21 @@ Empty the queue, removing all messages.
 
 ##### queue#exists([callback])
 
-Checks if the queue already exists or not.
+Checks if the queue exists in the local bus.
 
-* `callback` - receives `err` and result `true` if the queue exists, `false` otherwise
+* `callback` - receives `err` and `result` with a value of `true` if the queue exists, `false` otherwise
+
+##### queue#find([callback])
+
+Checks if the queue already exists in the local bus or a federated bus. Note that a queue can only be found
+if the federated bus has announced its existence to the federating buses. This is something that happens periodically
+during the lifecycle of the queue, where the frequency depends on the ttl of the queue.
+Normally this method would be called before calling `Queue#attach`.
+
+* `callback` - receives `err` and the `location` of the queue. 
+   if the queue exists locally, `location` will be set to `local`.
+   if the queue exists in a federated bus, `location` will be set to the url of the federated bus.
+   if the queue is not found, `location` is set to `null`.
 
 ##### queue#count([callback])
 
