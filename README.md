@@ -97,8 +97,8 @@ var bus = Bus.create({redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.
 // var bus = Bus.create({driver: 'ioredis', redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});
 // or specify the ioredis driver and cluster
 // var bus = Bus.create({driver: 'ioredis', layout: 'cluster', redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});
-// or specify the ioredis driver and sentinel
-// var bus = Bus.create({driver: 'ioredis', layout: 'sentinel', redis: ['redis://192.168.0.1:26379']});
+// or specify the ioredis driver and sentinels
+// var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: ['redis://192.168.0.1:26379']});
 
 bus.on('error', function(err) {
   // an error has occurred
