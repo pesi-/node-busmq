@@ -1,0 +1,19 @@
+site_name: BusMQ
+repo_url: https://github.com/capriza/node-busmq
+pages:
+    - Home: 'index.md'
+    - Usage: 'usage.md'
+    - Performance: 'performance.md'
+    - License: 'license.md'
+theme: mkdocs
+extra_css:
+    - css/extra.css
+
+markdown_extensions:
+    - toc:
+        permalink: 
+    - admonition:
+
+copyright: Copyright &copy; 2017 <a href="https://www.capriza.com">Capriza, Inc.</a>
+
+

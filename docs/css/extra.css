@@ -1,0 +1,70 @@
+body, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: Avenir,"Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 32px;
+}
+
+pre {
+    margin-top: 16px;
+}
+
+.col-md-9 img {
+    border: none;
+}
+
+div.col-md-9 h1:first-of-type {
+    text-align: center;
+    font-size: 60px;
+    font-weight: 300;
+}
+
+div.col-md-9 p:first-of-type {
+    text-align: center;
+}
+
+div.col-md-9 p.admonition-title:first-of-type {
+    text-align: left;
+}
+
+div.col-md-9 h1:first-of-type .headerlink {
+    display: none;
+}
+
+code.no-highlight {
+    color: black;
+}
+
+.bs-sidenav {
+    background-color: #555555;
+    border-radius: 0;
+}
+
+.bs-sidebar .nav > li > a {
+    color: #ffffff;
+    padding-left: 32px;
+}
+
+.bs-sidebar .nav > li.main > a {
+    padding-left: 20px;
+}
+
+.bs-sidenav>li>a:hover {
+    color: #999999;
+}
+
+.navbar {
+    background-color: #555555;
+    background-image: none;
+    border: none;
+}
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>li>a:hover, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
+    background-color: #fcd552;
+}
+
+.well {
+    border-radius: 0;
+}
