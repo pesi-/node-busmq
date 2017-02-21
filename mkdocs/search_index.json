@@ -1,0 +1,504 @@
+{
+    "docs": [
+        {
+            "location": "/", 
+            "text": "BusMQ\n\uf0c1\n\n\nBusMQ is a production grade message bus for node.js backed by \nRedis\n queues.\n\n\n\n\nFeatures\n\uf0c1\n\n\n\n\nEvent based message queues\n\n\nEvent based bi-directional channels for peer-to-peer communication (backed by message queues)\n\n\nReliable delivery of messages (AKA Guaranteed Delivery)\n\n\nPublish/Subscribe channels\n\n\nPersistent Publish/Subscribe (backed by message queues)\n\n\nFederation over distributed data centers\n\n\nDiscoverable queues over federation\n\n\nAuto expiration of queues after a pre-defined idle time\n\n\nScalability through the use of multiple redis instances and node processes\n\n\nHigh availability through redis master-slave setup and stateless node processes\n\n\nTolerance to dynamic addition of redis instances\n\n\nChoice of connection driver - \nnode_redis\n or \nioredis\n (thanks to \nbgrieder\n)\n\n\nOut-of-the-box support for Redis Sentinels and Clusters when using ioredis driver (thanks to \nbgrieder\n)\n\n\nConnect to the bus from a browser (via federation)\n\n\n\n\nMotivation\n\uf0c1\n\n\nThere are several exiting node modules that provide great queues-backed-by-redis functionality,\nsuch as \nKue\n, \nBull\n and\n\nConvoy\n, so what's so special about busmq?\n\n\nAlthough seemingly the other modules provide similar features, they lack a very specific feature that's required\nfor a reliable message queue: guaranteed order. \nJobs\n is the main focus for these modules, whereas busmq focuses on\n\nmessages\n.\n\n\nInherently, job processing does not require a certain order - if a job fails it can simply be retried\nat a later time with (usually) no ill-effects. However, message processing is very order dependant - if you receive a message\nout of order then there's no telling what the consequences may be. A good example is\n\nTCP message order importance\n - clients are guaranteed\nthat TCP packets are \nalways\n received in the correct order. That's what busmq focuses on, which makes busmq much\nmore like \nRabbitMQ\n rather than a generic queueing system.\n\n\nOf course, the other modules may double as messages queues, but that's just not their main focus. In addition, busmq\nprovides built-in features for peer-to-peer communication, scaling, high-availability and federation which are extremely important for a reliable\nmessaging system.\n\n\nHigh Availability and Scaling\n\uf0c1\n\n\nScaling is achieved by spreading queues and channels between multiple redis instances.\nThe redis instance is selected by performing a calculation on the queue/channel name.\nIf the redis instances are added and the designated redis instance of a queue changes because of it then\nthe bus will still find the correct redis instance. There will be some time penalty until the system\nstabilizes after the addition.\n\n\nHigh availability for redis is achieved by using standard redis high availability setups, such as\n\nRedis Cluster\n, \nRedis Sentinal\n or \nAWS ElasticCache\n\n\nInstallation\n\uf0c1\n\n\nnpm install --save busmq\n\n\n\n\nUsage\n\uf0c1\n\n\nSee \nUsage\n\n\nBrowser Support\n\uf0c1\n\n\nSee \nUsage#Browser Support\n\n\nTests\n\uf0c1\n\n\nRedis server must be installed to run the tests, but does not need to be running.\nDownload redis from \nhttps://redis.io\n.\n\n\n./node_modules/mocha/bin/mocha test", 
+            "title": "Home"
+        }, 
+        {
+            "location": "/#busmq", 
+            "text": "BusMQ is a production grade message bus for node.js backed by  Redis  queues.", 
+            "title": "BusMQ"
+        }, 
+        {
+            "location": "/#features", 
+            "text": "Event based message queues  Event based bi-directional channels for peer-to-peer communication (backed by message queues)  Reliable delivery of messages (AKA Guaranteed Delivery)  Publish/Subscribe channels  Persistent Publish/Subscribe (backed by message queues)  Federation over distributed data centers  Discoverable queues over federation  Auto expiration of queues after a pre-defined idle time  Scalability through the use of multiple redis instances and node processes  High availability through redis master-slave setup and stateless node processes  Tolerance to dynamic addition of redis instances  Choice of connection driver -  node_redis  or  ioredis  (thanks to  bgrieder )  Out-of-the-box support for Redis Sentinels and Clusters when using ioredis driver (thanks to  bgrieder )  Connect to the bus from a browser (via federation)", 
+            "title": "Features"
+        }, 
+        {
+            "location": "/#motivation", 
+            "text": "There are several exiting node modules that provide great queues-backed-by-redis functionality,\nsuch as  Kue ,  Bull  and Convoy , so what's so special about busmq?  Although seemingly the other modules provide similar features, they lack a very specific feature that's required\nfor a reliable message queue: guaranteed order.  Jobs  is the main focus for these modules, whereas busmq focuses on messages .  Inherently, job processing does not require a certain order - if a job fails it can simply be retried\nat a later time with (usually) no ill-effects. However, message processing is very order dependant - if you receive a message\nout of order then there's no telling what the consequences may be. A good example is TCP message order importance  - clients are guaranteed\nthat TCP packets are  always  received in the correct order. That's what busmq focuses on, which makes busmq much\nmore like  RabbitMQ  rather than a generic queueing system.  Of course, the other modules may double as messages queues, but that's just not their main focus. In addition, busmq\nprovides built-in features for peer-to-peer communication, scaling, high-availability and federation which are extremely important for a reliable\nmessaging system.", 
+            "title": "Motivation"
+        }, 
+        {
+            "location": "/#high-availability-and-scaling", 
+            "text": "Scaling is achieved by spreading queues and channels between multiple redis instances.\nThe redis instance is selected by performing a calculation on the queue/channel name.\nIf the redis instances are added and the designated redis instance of a queue changes because of it then\nthe bus will still find the correct redis instance. There will be some time penalty until the system\nstabilizes after the addition.  High availability for redis is achieved by using standard redis high availability setups, such as Redis Cluster ,  Redis Sentinal  or  AWS ElasticCache", 
+            "title": "High Availability and Scaling"
+        }, 
+        {
+            "location": "/#installation", 
+            "text": "npm install --save busmq", 
+            "title": "Installation"
+        }, 
+        {
+            "location": "/#usage", 
+            "text": "See  Usage", 
+            "title": "Usage"
+        }, 
+        {
+            "location": "/#browser-support", 
+            "text": "See  Usage#Browser Support", 
+            "title": "Browser Support"
+        }, 
+        {
+            "location": "/#tests", 
+            "text": "Redis server must be installed to run the tests, but does not need to be running.\nDownload redis from  https://redis.io .  ./node_modules/mocha/bin/mocha test", 
+            "title": "Tests"
+        }, 
+        {
+            "location": "/usage/", 
+            "text": "Usage\n\uf0c1\n\n\nHow to use BusMQ\n\n\n\n\nBus\n\uf0c1\n\n\nThe bus holds connections to one or more redis instances and is used\nto create \nqueue\ns, \nchannel\ns, \npubsub\ns and \npersistent\n objects.\n\n\nNode processes connecting to the same bus have access to and can use all queues, channels pubsubs and persistent objects.\n\n\nbusmq uses by default \nnode_redis\n as the communication driver,\nbut ioredis may also be used, and in fact is mandatory when connecting to a cluster or sentinels.\nUse the \ndriver\n option when creating the bus instance.\n\n\nIf the redis server requires an authentication password, specify it in auth part of the redis connection url.\n\n\nvar Bus = require('busmq');\n\nvar bus = Bus.create({redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});\n// or specify the node-redis driver explicitly\n// var bus = Bus.create({driver: 'node-redis', redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});\n// or specify the ioredis driver explicitly\n// var bus = Bus.create({driver: 'ioredis', redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});\n// or specify the ioredis driver and cluster\n// var bus = Bus.create({driver: 'ioredis', layout: 'cluster', redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});\n// or specify the ioredis driver and sentinels\n// var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: ['redis://192.168.0.1:26379']});\n\nbus.on('error', function(err) {\n  // an error has occurred\n});\nbus.on('online', function() {\n  // the bus is online - we can use queues, channels ans persistent objects\n});\nbus.on('offline', function() {\n  // the bus is offline - redis is down...\n});\n\n// connect the redis instances\nbus.connect();\n\n\n\n\nbus.create([options])\n\uf0c1\n\n\nCreate a new bus instance.\n\n\n\n\ndriver\n -  specify the redis connection driver to use.\n              This should be either \nnode-redis\n or \nioredis\n. The default is \nnode-redis\n\n\nlayout\n - specifies the type of redis setup to connect to. This should be one of \ndirect\n, \ncluster\n or \nsentinels\n.\n             The default is \ndirect\n.\n\n\nredis\n -  specifies the redis servers to connect to. Can be a string or an array of string urls.\n             A valid url has the form \nredis://[auth_pass@]\nhost_or_ip\n[:port]\n.\n\n\nfederate\n - an object defining federation options:\n\n\nserver\n -  an http/https server object to listen for incoming federation connections. if undefined then federation server will not be open\n\n\npath\n - the path within the server to accept federation requests on\n\n\nurls\n - an array of urls of the form \nhttp[s]://\nip-or-host\n[:port]\n of other bus instances that this bus can federate to. default is an empty array.\n\n\npoolSize\n - the number of web sockets to keep open and idle at all times to federated bus instances. default is 10.\n\n\nsecret\n - String|Function. if a string, the secret key to be shared among all bus instances that can federate to each other. if a function,\n               the federver will call it to determine if the client is to be accepted (read more about the function\n               behavior at https://github.com/websockets/ws/blob/master/doc/ws.md#optionsverifyclient). default is \nnotsosecret\n.\n\n\nlogger\n - the logger that the bus should use\n\n\nlogLevel\n - specify the bus log level. possible values are 'error', 'warning', 'info', 'debug'. default is 'error'\n\n\n\n\nCall \nconnect\n to connect to the redis instances and to open the federation server.\n\n\nbus.withLog(log)\n\uf0c1\n\n\nAttach a logger to the bus instance. Returns the bus instance.\n\n\nbus.debug(on)\n\uf0c1\n\n\nTurn on or off printing of debug messages to the log. default is off.\n\n\nbus.connect()\n\uf0c1\n\n\nConnect to the redis servers and start the federation server (if one was specified). Once connected to all redis instances, the \nonline\n will be emitted.\nIf the bus gets disconnected from the the redis instances, the \noffline\n event will be emitted.\n\n\nbus.disconnect()\n\uf0c1\n\n\nDisconnect from the redis instances and stop the federation server. Once disconnected, the \noffline\n event will be emitted.\n\n\nbus.isOnline()\n\uf0c1\n\n\nReturn \ntrue\n if the bus is online, \nfalse\n if the bus offline.\n\n\nbus.queue(name)\n\uf0c1\n\n\nCreate a new \nQueue\n instance.\n\n\n\n\nname\n - the name of the queue.\n\n\n\n\nReturns a new Queue instance. Call \nqueue.attach\n before using the queue.\n\n\nbus.channel(name [, local, remote])\n\uf0c1\n\n\nCreate a new \nChannel\n instance.\n\n\n\n\nname\n - the name of the channel.\n\n\nlocal\n - [optional] specifies the local role. default is \nlocal\n.\n\n\nremote\n - [optional] specifies the remote role. default is \nremote\n.\n\n\n\n\nbus.pubsub(name)\n\uf0c1\n\n\nCreate a new \nPubsub\n instance.\n\n\n\n\nname\n - the name of the pubsub channel.\n\n\n\n\nReturns a new Pubsub instance.\n\n\nbus.persistify(name, object, properties)\n\uf0c1\n\n\nCreate a new \nPersistable\n object. Persistifying an object adds additional methods to the persistified object.\nSee the  API for more details.\n\n\n\n\nname\n - the name of the persisted object.\n\n\nobject\n - the object to persistify.\n\n\nproperties\n - an array of property names to persist.\n\n\n\n\nbus.federate(object, target)\n\uf0c1\n\n\nFederate \nobject\n to the specified \ntarget\n instead of hosting the object on the local redis servers.\nDo not use any of the object API's before federation setup is complete.\n\n\n\n\nobject\n - \nqueue\n, \nchannel\n or \npersisted\n objects to federate. These are created normally through \nbus.queue\n, \nbus.channel\n and \nbus.persistify\n.\n\n\ntarget\n - the target bus url or an already open websocket to the target bus. The url has the form \nhttp[s]://\nlocation\n[:\nport\n]\n\n\n\n\nBus Events\n\uf0c1\n\n\n\n\nonline\n - emitted when the bus has successfully connected to all of the specified redis instances\n\n\noffline\n - emitted when the bus loses connections to the redis instances\n\n\nerror\n - an error occurs\n\n\n\n\nQueue\n\uf0c1\n\n\nA queue of messages.\n\n\nMessages are pushed to the queue and consumed from it in they order that they were pushed.\n\n\nAny number of clients can produce messages to a queue, and any number of consumers\ncan consume messages from a queue.\n\n\nAttach and Detach\n\uf0c1\n\n\nPushing messages and consuming them requires attaching to the queue.\nThe queue will remain in existence for as long as it has at least one client attached to it.\n\n\nTo stop using a queue, detach from it. Once a queue has no more clients attached, it will automatically expire\nafter a predefined ttl (also losing any messages in it).\n\n\nProducing Messages\n\uf0c1\n\n\nvar Bus = require('busmq');\nvar bus = Bus.create({redis: ['redis://127.0.0.1:6379']});\nbus.on('online', function() {\n  var q = bus.queue('foo');\n  q.on('attached', function() {\n    console.log('attached to queue');\n  });\n  q.attach();\n  q.push({hello: 'world'});\n  q.push('my name if foo');\n});\nbus.connect();\n\n\n\n\nConsuming Messages\n\uf0c1\n\n\nvar Bus = require('busmq');\nvar bus = Bus.create({redis: ['redis://127.0.0.1:6379']});\nbus.on('online', function() {\n  var q = bus.queue('foo');\n  q.on('attached', function() {\n    console.log('attached to queue. messages will soon start flowing in...');\n  });\n  q.on('message', function(message, id) {\n    if (message === 'my name if foo') {\n      q.detach();\n    }\n  });\n  q.attach();\n  q.consume(); // the 'message' event will be fired when a message is retrieved\n});\nbus.connect();\n\n\n\n\nConsumption Modes\n\uf0c1\n\n\nThere are three modes that messages can be consumed from a queue, with various degrees of\nflexibility for each mode.\n\n\nUnreliable Delivery\n\uf0c1\n\n\nThis is a \nZero-or-Once\n message delivery mode, which is also the default mode.\nMessages are consumed from the queue by one consumer only and will not be consumed again by that consumer or any other consumer.\nThis method of consumption is unreliable in a sense that if the consumer crashes before being able to\nhandle the message, it is lost forever.\n\n\n// consume with default settings\nq.consume();\n\n// this is the same as the default settings\nq.consume({reliable: false, remove: true});\n\n\n\n\nReliable Delivery (Guarantee Delivery)\n\uf0c1\n\n\nThis is a \nOnce-or-More\n message delivery mode, where it is guaranteed that messages will be delivered at least once.\nEvery consumed message enters a 'waiting for ack' state. The consumer should call 'ack' on a message in order to\nmark it as handled. When the client issues an 'ack' on the message, the message\nis permanently discarded from the queue and will not be consumed again.\n\n\nIf a client crashes when consuming in this mode, any messages that have not been ACKed will be delivered once more\nwhen a client starts to consume again.\n\n\nNote:\n This mode does not work well with multiple consumers. The behavior of multiple clients consuming in reliable\nmode from the same queue is undefined.\n\n\n// consume message reliably. message with id 3 is the last acked message\nq.consume({reliable: true, last: 3});\n\n\n\n\nPersistent Publish/Subscribe\n\uf0c1\n\n\nThis is a form of publish/subscribe, where all consumers receive all messages, even if they were not consuming at the time messages were\nbeing pushed to the queue. A consumer can also specify the index of the message to start consuming from.\n\n\nThis is different than regular publish/subscribe since persistent publish/subscribe utilizes message queues to store\nevery published message, whereas regular publish/subscribe does not store published messages at any time.\n\n\nBe careful using Persistent publish/subscribe for long periods of time and many messages since the messages are stored\nin the queue for the entire existence of the queue. Misuse may lead to memory growth and an\neventual blowup of the redis server.\n\n\n// consume message without removing them from the queue. start consuming from message at index 0.\nq.consume({remove: false, index: 0});\n\n\n\n\nqueue.attach([options])\n\uf0c1\n\n\nAttach to the queue. If the queue does not already exist it is created.\nOnce attached, the \nattached\n event is emitted.\n\n\nOptions:\n\n\n\n\nttl\n - duration in seconds for the queue to live without any attachments. default is 30 seconds.\n\n\ndiscoverable\n - whether this queue should notify all the federating buses connected to this bus about this queue. \n                   finding a discoverable queue is performed using the \nqueue.find#\n method. default is false.\n\n\n\n\nqueue.detach()\n\uf0c1\n\n\nDetach from the queue. The queue will continue to live for as long as it has at least one attachment.\nOnce a queue has no more attachments, it will continue to exist for the predefined \nttl\n, or until it\nis attached to again.\n\n\nqueue.push(message[, callback])\n\uf0c1\n\n\nPush a message to the queue. The message can be a JSON object or a string. \nThe message will remain in the queue until it is consumed by a consumer.\n\n\n\n\nmessage\n - the message to push\n\n\ncallback\n - invoked after the message was actually pushed to the queue. receives \nerr\n and the \nid\n of the pushed message\n\n\n\n\nqueue.consume([options])\n\uf0c1\n\n\nStart consuming messages from the queue.\nThe \nmessage\n event is emitted whenever a message is consumed from the queue.\n\n\nOptions:\n\n \nmax\n if specified, only \nmax\n messages will be consumed from the queue. If not specified,\nmessages will be continuously consumed as they are pushed into the queue.\n\n \nremove\n - \ntrue\n indicates to remove a read message from the queue, and \nfalse\n leaves it in the queue so that it may be read once more. default is \ntrue\n.\n\nNote\n: The behavior of mixing consumers that remove messages with consumers that do not remove messages from the same queue is undefined.\n\n \nreliable\n - applicable only if \nremove\n is \ntrue\n. indicates that every consumed message needs to be ACKed in order not to receive it again in case of\ncalling \nconsume\n again. see \nqueue.ack\n for ack details. default is \nfalse\n.\n\n \nlast\n - applicable only if \nreliable\n is \ntrue\n. indicates the last message id that was ACKed so that only messages with higher id's should be received.\nif any messages still exist in the queue with id's lower than \nlast\n they will be discarded.\nthis behaves exactly like calling \nqueue.ack\n with the last id before starting to consume. default is 0.\n\n\nqueue.ack(id[, callback])\n\uf0c1\n\n\nSpecifies that the message with the specified id, and all messages with lower id's, can safely be discarded so that\nthey should never be consumed again. Ignored if not consuming in reliable mode.\n\n\n\n\nid\n - the message id to ack\n\n\ncallback\n - invoked after the message was actually acked. receives \nerr\n.\n\n\n\n\nqueue.isConsuming([callback])\n\uf0c1\n\n\nReturns \ntrue\n if this client is consuming messages, \nfalse\n otherwise.\n\n\n\n\ncallback\n - receives \nerr\n and the consuming state\n\n\n\n\nqueue.stop()\n\uf0c1\n\n\nStop consuming messages from the queue.\n\n\nqueue.close()\n\uf0c1\n\n\nCloses the queue and destroys all messages. Emits the \nclosed\n event once it is closed.\n\n\nqueue.flush([callback])\n\uf0c1\n\n\nEmpty the queue, removing all messages.\n\n\n\n\ncallback\n - invoked after the queue was flushed. receives \nerr\n.\n\n\n\n\nqueue.exists([callback])\n\uf0c1\n\n\nChecks if the queue exists in the local bus.\n\n\n\n\ncallback\n - receives \nerr\n and \nresult\n with a value of \ntrue\n if the queue exists, \nfalse\n otherwise\n\n\n\n\nqueue.find([callback])\n\uf0c1\n\n\nChecks if the queue already exists in the local bus or a federated bus. Note that a queue can only be found\nif the federated bus has announced its existence to the federating buses. This is something that happens periodically\nduring the lifecycle of the queue, where the frequency depends on the ttl of the queue.\nNormally this method would be called before calling \nqueue.attach\n.\n\n\n\n\ncallback\n - receives \nerr\n and the \nlocation\n of the queue. \n   if the queue exists locally, \nlocation\n will be set to \nlocal\n.\n   if the queue exists in a federated bus, \nlocation\n will be set to the url of the federated bus.\n   if the queue is not found, \nlocation\n is set to \nnull\n.\n\n\n\n\nqueue.count([callback])\n\uf0c1\n\n\nGet the number if messages in the queue.\n\n\n\n\ncallback\n - receives \nerr\n and the number of messages in the queue\n\n\n\n\nqueue.ttl([callback])\n\uf0c1\n\n\nGet the time in seconds for the queue to live without any attachments.\n\n\n\n\ncallback\n - receives \nerr\n and the ttl in seconds\n\n\n\n\nqueue.metadata(key [, value][, callback])\n\uf0c1\n\n\nGet or set arbitrary metadata on the queue.\nWill set the metadata \nkey\n to the provided \nvalue\n, or get the current value of the key if the \nvalue\n parameter is not provided.\n\n\n\n\nkey\n - the metadata key to set or get\n\n\nvalue\n - [optional] the value to set on the key.\n\n\ncallback\n - receives \nerr\n as the first argument. if setting a metadata value, it is called with no further arguments.\nif retrieving the value, it is called with the retrieved value.\n\n\n\n\nqueue.pushed([callback])\n\uf0c1\n\n\nReturns the number of messages pushed by this client to the queue\n\n\n\n\ncallback\n - receives \nerr\n and the number of pushed messages\n\n\n\n\nqueue.consumed([callback])\n\uf0c1\n\n\nReturns the number of messages consumed by this client from the queue\n\n\n\n\ncallback\n - receives \nerr\n and the number of consumed messages\n\n\n\n\nQueue Events\n\uf0c1\n\n\n\n\nattaching\n - emitted when starting to attach\n\n\nattached\n - emitted when attached to the queue. The listener callback receives \ntrue\n if the queue already exists\nand \nfalse\n if it was just created.\n\n\ndetaching\n - emitted when starting to detach\n\n\ndetached\n - emitted when detached from the queue. If no other clients are attached to the queue, the queue will remain alive for the \nttl\n duration\n\n\nconsuming\n - emitted when starting or stopping to consume messages from the queue. The listener callback will receive \ntrue\n\nif starting to consume and \nfalse\n if stopping to consume.\n\n\nmessage\n - emitted when a message is consumed from the queue. The listener callback receives the message as a string and the id of the message as an integer.\n\n\nerror\n - emitted when some error occurs. The listener callback receives the error.\n\n\n\n\nChannel\n\uf0c1\n\n\nA bi-directional channel for peer-to-peer communication. Under the hood, a channel uses two message queues,\nwhere each peer pushes messages to one queue and consumes messages from the other queue.\nIt does not matter which peer connects to the channel first.\n\n\nEach peer in the channel has a role. For all purposes roles are the same, except that the roles determine to which\nqueue messages will be pushed and from which queue they will be consumed. To peers to communicate over the channel, they must have opposite roles.\n\n\nBy default, a channel uses role \nlocal\n to consume messages and \nremote\n to push messages.\nSince peers must have opposite roles, if using the default roles, one peer must call \nchannel.listen\n and the other peer must call \nchannel.connect\n.\n\n\nIt is also possible to specify other roles explicitly, such as \nclient\n and \nserver\n.\nThis enables specifying the local role and the remote role, and just connecting the channel without calling \nlisten\n.\nSpecifying roles explicitly may add to readability, but not much more than that.\n\n\nA channel supports the same consumption modes as a queue does. See \nConsumption Modes\n for details.\n\n\nUsing a channel (default roles)\n\uf0c1\n\n\nServer endpoint:\n\n\nbus.on('online', function() {\n  var c = bus.channel('bar'); // use default names for the endpoints\n  c.on('connect', function() {\n    // connected to the channel\n  });\n  c.on('remote:connect', function() {\n    // the client is connected to the channel\n    c.send('hello client!');\n  });\n  c.on('message', function(message) {\n    // received a message from the client\n  });\n  c.listen(); // reverse the endpoint roles and connect to the channel\n});\n\n\n\n\nClient endpoint:\n\n\nbus.on('online', function() {\n  var c = bus.channel('bar'); // use default names for the endpoints\n  c.on('connect', function() {\n    // connected to the channel\n  });\n  c.on('remote:connect', function() {\n    // the server is connected to the channel\n    c.send('hello server!');\n  });\n  c.on('message', function(message) {\n    // received a message from the server\n  });\n  c.connect(); // connect to the channel\n});\n\n\n\n\nUsing a channel (explicit roles)\n\uf0c1\n\n\nServer endpoint:\n\n\nbus.on('online', function() {\n  // local role is server, remote role is client\n  var c = bus.channel('zoo', 'server', 'client');\n  c.on('connect', function() {\n    // connected to the channel\n  });\n  c.on('remote:connect', function() {\n    // the client is connected to the channel\n    c.send('hello client!');\n  });\n  c.on('message', function(message) {\n    // received a message from the client\n  });\n  c.connect(); // connect to the channel\n});\n\n\n\n\nClient endpoint:\n\n\nbus.on('online', function() {\n  // notice the reverse order of roles\n  // local role is client, remote role is server\n  var c = bus.channel('zoo', 'client', 'server');\n  c.on('connect', function() {\n    // connected to the channel\n  });\n  c.on('remote:connect', function() {\n    // the server is connected to the channel\n    c.send('hello server!');\n  });\n  c.on('message', function(message) {\n    // received a message from the server\n  });\n  c.connect(); // connect to the channel\n});\n\n\n\n\nchannel.connect()\n\uf0c1\n\n\nConnects to the channel. The \nconnect\n event is emitted once connected to the channel.\n\n\nchannel.attach()\n\uf0c1\n\n\nAlias to \nchannel.connect()\n\n\nchannel.listen()\n\uf0c1\n\n\nConnects to the channel with reverse semantics of the roles. \nThe \nconnect\n event is emitted once connected to the channel.\n\n\nchannel.send(message[, callback])\n\uf0c1\n\n\nSend a message to the peer. The peer does need to be connected for a message to be sent.\n\n\n\n\nmessage\n - the message to send\n\n\ncallback\n - invoked after the message was actually pushed to the channel. receives \nerr\n and the \nid\n of the pushed message\n\n\n\n\nchannel.sendTo(endpoint, message[, callback])\n\uf0c1\n\n\nSend a message to the the specified endpoint. There is no need to connect to the channel with \nchannel.connect\n or \nchannel.listen\n.\n\n\n\n\nendpoint\n - the target endpoint to receive the message\n\n\nmessage\n - the message to send\n\n\ncallback\n - invoked after the message was actually pushed to the channel. receives \nerr\n and the \nid\n of the pushed message\n\n\n\n\nchannel.disconnect()\n\uf0c1\n\n\nDisconnect from the channel. The channel remains open and a different peer can connect to it.\n\n\nchannel.detach()\n\uf0c1\n\n\nAlias to \nchannel.disconnect()\n\n\nchannel.end()\n\uf0c1\n\n\nEnd the channel. No more messages can be pushed or consumed. This also caused the peer to disconnect from the channel and close the message queues.\n\n\nchannel.ack(id[, callback])\n\uf0c1\n\n\nSee \nqueue.ack\n for details\n\n\nchannel.isAttached([callback])\n\uf0c1\n\n\nReturns \ntrue\n if connected to the channel, \nfalse\n if not connected.\n\n\nChannel Events\n\uf0c1\n\n\n\n\nconnect\n - emitted when connected to the channel\n\n\nremote:connect\n - emitted when a remote peer connects to the channel\n\n\ndisconnect\n - emitted when disconnected from the channel\n\n\nremote:disconnect\n - emitted when the remote peer disconnects from the channel\n\n\nmessage\n - emitted when a message is received from the channel. The listener callback receives the message as a string.\n\n\nend\n - emitted when the remote peer ends the channel\n\n\nerror\n - emitted when an error occurs. The listener callback receives the error.\n\n\n\n\nPersistable\n\uf0c1\n\n\nIt is possible to persist arbitrary objects to the bus.\nA persistable object defines a set of properties on the object that are tracked for modification. When\nsaving a dirty object (where dirty means that some tracked properties have changed) only those dirty properties are\npersisted to the bus. Loading a persistable object reads all of the persisted properties.\n\n\nbus.on('online', function() {\n  var object = {field: 'this field is not persisted'};\n  var p = bus.persistify('obj', object, ['foo', 'bar', 'zoo']);\n  p.foo = 'hello';\n  p.bar = 1;\n  p.zoo = true;\n  p.save(function(err) {\n    // foo, bar and zoo fields have been saved\n  });\n\n  p.foo = 'world';\n  p.save(function(err) {\n    // only foo has been saved\n  });\n\n  // load the persistified properties\n  var p2 = bus.persistify('obj', {}, ['foo', 'bar', 'zoo']);\n  p2.load(function(err, exists) {\n    // exists == true\n    // p2.foo == 'world'\n    // p2.bar == 2\n    // p2.zpp == true'\n  });\n});\n\n\n\n\npersistable.save([callback])\n\uf0c1\n\n\nSave all the dirty properties. The dirty properties are marked as not dirty after the save completes.\n\n\n\n\ncallback\n - called when the save has finished. receives \nerr\n if there was an error.\n\n\n\n\npersistable.load([callback])\n\uf0c1\n\n\nLoad all the tracked properties. All properties are marked as not dirty after the load completes.\n\n\n\n\ncallback\n  - called when the load has finished. receives \nerr\n, \nexists\n and \nid\n\nwhere \nexists\n is true if the persisted object was found in the bus and \nid\n is the id of the object whose data was searched.\n\n\n\n\npersistable.persist(ttl)\n\uf0c1\n\n\nStart a periodic timer to continuously mark the persisted object as being used.\n\n\n\n\nttl\n specifies the number of seconds to keep the object alive in the bus.\n\n\n\n\npersistable.unpersist()\n\uf0c1\n\n\nStop the periodic timer. This will cause object to expire after the defined ttl provided in the persist method.\n\n\nPublish/Subscribe\n\uf0c1\n\n\nA plain old publish/subscribe channel. These channels are not backed by queues, so any subscriber not subscribed at the\ntime a message is published will not receive the message.\n\n\nPublish/Subscribe channel are always created on the first redis server in the list of redis servers\nthe bus is connected to. The reason for this is the time it would take to locate a publish/subscribe channel via the\nredis api were the channels distributed between all redis servers (it's O(N) where N is the number of subscribers).\n\n\nbus.on('online', function() {\n  var s = bus.pubsub('my pubsub channel');\n  s.on('message', function(message) {\n    // received message 'hello world' on subscribed channel\n  });\n  s.subscribe();\n\n  var p = bus.pubsub('my pubsub channel');\n  p.publish('hello world');\n});\n\n\n\n\npubsub.publish(message[, callback])\n\uf0c1\n\n\nPublishes a message on the pubsub channel. Only currently subscribed clients will receive the message.\n\n\n\n\nmessage\n - the message to publish\n\n\ncallback\n - invoked after the message was actually published. receives \nerr\n if there was an error. \nnote: starting\nfrom version 1.5.0, the callback no longer receives the number of subscribers that received the message.\n\n\n\n\npubsub.subscribe()\n\uf0c1\n\n\nSubscribes to message in the pubsub channel. Once a message is received, the \nmessage\n event will be emitted.\n\n\npubsub.unsubscribe()\n\uf0c1\n\n\nUnsubscribes from messages on the pubsub channel. Messages can still be published using the \npublish\n method.\n\n\npubsub.isSubscribed()\n\uf0c1\n\n\nReturns \ntrue\n if subscribed to messages from the pubsub channel, \nfalse\n if not.\n\n\nPubsub Events\n\uf0c1\n\n\n\n\nsubscribed\n - emitted when subscribed to messages on the pubsub channel\n\n\nunsubscribed\n - emitted when unsubscribing from the pubsub channel\n\n\nmessage\n - emitted when a message is received from the pubsub channel. The listener callback receives the message as a string.\n\n\nerror\n - emitted when an error occurs. The listener callback receives the error.\n\n\n\n\nFederation\n\uf0c1\n\n\nIt is sometimes desirable to setup bus instances in different locations, where redis\nservers of one location are not directly accessible to other locations. This setup is very common\nwhen building a bus that spans several data centers, where each data center is isolated behind a firewall.\n\n\nFederation enables using queues, channels and persisted objects of a bus without access to the redis servers themselves.\nWhen federating an object, the federating bus uses web sockets to the target bus as the federation channel,\nand the federated bus manages the object on its redis servers on behalf of the federating bus.\nThe federating bus does not host the federated objects on the local redis servers.\n\n\nFederation is done over web sockets since they are firewall and proxy friendly.\n\n\nThe federating bus utilizes a simple pool of always-connected web sockets. When a bus is initialized, it\nspins up an fixed number of web sockets that connect to federated bus instances. When federating an object, the bus\nselects a web socket from the pool and starts federating the object over it.\n\n\nThe API and events of a federated objects are exactly the same as a non-federated objects. This is achieved\nusing the \ndnode\n module for RPCing the object API.\n\n\nOpening a bus with a federation server\n\uf0c1\n\n\n// this server is running on 192.168.0.1\nvar http = require('http');\nvar httpServer = http.createServer(); // create the http server to serve as the federation server. you can also use express if you like...\nhttpServer.listen(8881);\nvar Bus = require('busmq');\nvar options = {\n  redis: 'redis://127.0.0.1', // connect this bus to a local running redis\n  federate: { // also open a federation server\n    server: httpServer,  // use the provided http server as the federation server\n    secret: 'mysecret',   // a secret key for authorizing clients\n    path: '/my/fed/path' // the federation service is accessible on this path in the server\n  }\n};\nvar bus = Bus.create(options);\nbus.on('online', function() {\n  // the bus is now ready to receive federation requests\n});\nbus.connect();\n\n\n\n\nFederating a queue\n\uf0c1\n\n\nvar Bus = require('busmq');\nvar options = {\n  federate: { // connect to a federate bus\n    poolSize: 5, // keep the pool size with 5 web sockets\n    urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url\n    secret: 'mysecret'  // the secret key to authorize with the federation server\n  }\n};\nvar bus = Bus.create(options);\nbus.on('online', function() {\n // federate the queue to a bus located at a different data center\n var fed = bus.federate(bus.queue('foo'), 'http://192.168.0.1:8881/my/fed/path');\n fed.on('ready', function(q) {\n   // federation is ready - we can start using the queue\n   q.on('attached', function() {\n     // do whatever\n   });\n   q.attach();\n });\n});\nbus.connect();\n\n\n\n\nFinding a queue\n\uf0c1\n\n\nIt is possible to find a queue that exists in a federated bus. \nNote that a queue can only be found if the federated bus has announced its existence to the federating buses. \nThis is something that happens periodically during the lifecycle of the queue, where the announcement frequency\n\ndepends on the ttl of the queue (frequency is ttl/3)\n\n\nMaking a queue discoverable\n\uf0c1\n\n\n // a queue named 'foo' is created in the federated bus at http://192.168.0.1:8881 and is made discoverable\n var queue = bus.queue('foo');\n queue.attach({discoverable: true});\n\n\n\n\nFinding the discoverable queue\n\uf0c1\n\n\n  // find the queue named 'foo'\n  var queue = bus.queue('foo');\n  queue.find(function(err, location) {\n    console.log(location === 'http://192.168.0.1:8881/my/fed/path'); // will print 'true'\n    // we can now federate the queue\n    var fed = bus.federate(queue, location);\n  });\n\n\n\n\nFederating a channel\n\uf0c1\n\n\nvar Bus = require('busmq');\nvar options = {\n  federate: { // connect to a federate bus\n    poolSize: 5, // keep the pool size with 5 web sockets\n    urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url\n    secret: 'mysecret'  // the secret key to authorize with the federation server\n  }\n};\nvar bus = Bus.create(options);\nbus.on('online', function() {\n // federate the channel to a bus located at a different data center\n var fed = bus.federate(bus.channel('bar'), 'http://192.168.0.1:8881/my/fed/path');\n fed.on('ready', function(c) {\n   // federation is ready - we can start using the channel\n   c.on('message', function(message) {\n     // do whatever\n   });\n   c.attach();\n });\n});\nbus.connect();\n\n\n\n\nFederating a persistable object\n\uf0c1\n\n\nvar Bus = require('busmq');\nvar options = {\n  federate: { // connect to a federate bus\n    poolSize: 5, // keep the pool size with 5 web sockets\n    urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url\n    secret: 'mysecret'  // the secret key to authorize with the federation server\n  }\n};\nvar bus = Bus.create(options);\nbus.on('online', function() {\n // federate the persistent object to a bus located at a different data center\n var fed = bus.federate(bus.persistify('bar', object, ['field1', 'field2']), 'http://192.168.0.1:8881/my/fed/path');\n fed.on('ready', function(p) {\n   // federation is ready - we can start using the persisted object\n   p.load(function(err, exists) {\n     // do whatever\n   });\n });\n});\nbus.connect();\n\n\n\n\nFederating a pubsub\n\uf0c1\n\n\nvar Bus = require('busmq');\nvar options = {\n  federate: { // also connect to a federate bus\n    poolSize: 5, // keep the pool size with 5 web sockets\n    urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url\n    secret: 'mysecret'  // the secret ket to authorize with the federation server\n  }\n};\nvar bus = Bus.create(options);\nbus.on('online', function() {\n // federate the channel to a bus located at a different data center\n var fed = bus.federate(bus.pubsub('bar'), 'http://192.168.0.1:8881/my/fed/path');\n fed.on('ready', function(p) {\n   // federation is ready - we can start using pubsub\n   p.on('message', function(message) {\n     // do whatever\n   });\n   p.subscribe();\n   p.publish('foo bar');\n });\n});\nbus.connect();\n\n\n\n\nfederate.close(disconnect)\n\uf0c1\n\n\nClose the federation object.\n\n\n\n\ndisconnect\n - true to disconnect the underlying websocket\n\n\n\n\nFederate Events\n\uf0c1\n\n\n\n\nready\n - emitted when the federation setup is ready. The callback receives the bus object to use.\n\n\nunauthorized\n - incorrect secret key was used to authenticate with the federation server\n\n\nreconnecting\n - the federation connection was disconnected and is now reconnecting\n\n\nreconnected\n - the federation connection has successfully reconnected\n\n\nclose\n - the federation connection closed permanently\n\n\nerror\n - some error occurred. the callback receives the \nerror\n message\n\n\n\n\nBrowser Support\n\uf0c1\n\n\nBrowser support is achieved through the use of federation to the bus server over native browser websockets. \nThe following API is only available from a browser connecting to a federation server.\nIt enables the use of queues, channels and persisted objects.\n\n\nHow to Build\n\uf0c1\n\n\nGenerating the latest \nbusmq.js\n and \nbusmq.min.js\n files requires cloning the git repo.\n\n\ngit clone https://github.com/capriza/node-busmq.git\ncd node-busmq\nnpm install\nnpm run browser\n\n\n\n\nUsage\n\uf0c1\n\n\nscript src=\nbusmq.min.js\n/script\n\n\n\nscript\n\n  // connect to the bus running a federation server on port 8080 and with secret 'notsosecret'\n  var bus = busmq('ws://localhost:8080/', 'notsosecret');\n\n  // create a queue object named 'foo'.\n  // the queue will be created in the bus and the callback will be invoked when the queue is ready\n  bus.queue('foo', function(err, q) {\n    if (err) {\n      console.log('bus: error ' + err);\n      return;\n    }\n    console.log('bus: q ready');\n    q.on('attached', function() {\n      console.log('bus: queue attached');\n      // push 5 messages to the queue\n      for (var i = 0; i \n 5; ++i) {\n        q.push('message number ' + i);\n      }\n    });\n    q.on('message', function(message, id) {\n      // 5 messages should be received\n      console.log('got bus message ' + id + ': ' + message);\n    });\n    // attach to the queue and consume messages from it\n    q.attach();\n    q.consume();\n  });\n\n/script\n\n\n\n\n\nbusmq(url, secret)\n\uf0c1\n\n\nConnect to the federation server a of running bus.\nReturns a \nBus\n object.\n\n\n\n\nurl\n - the url of the bus federation server. the protocol must be \nws\n or \nwss\n.\n\n\nsecret\n - the federation server secret\n\n\n\n\nbus.queue(name, cb)\n\uf0c1\n\n\nCreate a federated \nqueue\n object.\n\n\n\n\nname\n - queue name\n\n\ncb\n - callback invoked when the federated object is ready. the callback format is \nfunction(err, queue)\n.\n\n\n\n\nbus.channel(name, local, remote, cb)\n\uf0c1\n\n\nCreate a federated \nchannel\n object.\n\n\n\n\nname\n - channel name\n\n\nlocal\n - local role\n\n\nremote\n - remote role\n\n\ncb\n - callback invoked when the federated object is ready. the callback format is \nfunction(err, channel)\n.\n\n\n\n\nbus.pubsub(name, cb)\n\uf0c1\n\n\nCreate a federated \npubsub\n object.\n\n\n\n\nname\n - queue name\n\n\ncb\n - callback invoked when the federated object is ready. the callback format is \nfunction(err, pubsub)\n.\n\n\n\n\nbus.persistify(name, object, attributes, cb)\n\uf0c1\n\n\nCreate a federated \npersistable\n object.\n\n\n\n\nname\n - channel name\n\n\nobject\n - the object to persistify\n\n\nattributes\n - object attributes to persist\n\n\ncb\n - callback invoked when the federated object is ready. the callback format is \nfunction(err, persisted)\n.", 
+            "title": "Usage"
+        }, 
+        {
+            "location": "/usage/#usage", 
+            "text": "How to use BusMQ", 
+            "title": "Usage"
+        }, 
+        {
+            "location": "/usage/#bus", 
+            "text": "The bus holds connections to one or more redis instances and is used\nto create  queue s,  channel s,  pubsub s and  persistent  objects.  Node processes connecting to the same bus have access to and can use all queues, channels pubsubs and persistent objects.  busmq uses by default  node_redis  as the communication driver,\nbut ioredis may also be used, and in fact is mandatory when connecting to a cluster or sentinels.\nUse the  driver  option when creating the bus instance.  If the redis server requires an authentication password, specify it in auth part of the redis connection url.  var Bus = require('busmq');\n\nvar bus = Bus.create({redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});\n// or specify the node-redis driver explicitly\n// var bus = Bus.create({driver: 'node-redis', redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});\n// or specify the ioredis driver explicitly\n// var bus = Bus.create({driver: 'ioredis', redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});\n// or specify the ioredis driver and cluster\n// var bus = Bus.create({driver: 'ioredis', layout: 'cluster', redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});\n// or specify the ioredis driver and sentinels\n// var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: ['redis://192.168.0.1:26379']});\n\nbus.on('error', function(err) {\n  // an error has occurred\n});\nbus.on('online', function() {\n  // the bus is online - we can use queues, channels ans persistent objects\n});\nbus.on('offline', function() {\n  // the bus is offline - redis is down...\n});\n\n// connect the redis instances\nbus.connect();", 
+            "title": "Bus"
+        }, 
+        {
+            "location": "/usage/#buscreateoptions", 
+            "text": "Create a new bus instance.   driver  -  specify the redis connection driver to use.\n              This should be either  node-redis  or  ioredis . The default is  node-redis  layout  - specifies the type of redis setup to connect to. This should be one of  direct ,  cluster  or  sentinels .\n             The default is  direct .  redis  -  specifies the redis servers to connect to. Can be a string or an array of string urls.\n             A valid url has the form  redis://[auth_pass@] host_or_ip [:port] .  federate  - an object defining federation options:  server  -  an http/https server object to listen for incoming federation connections. if undefined then federation server will not be open  path  - the path within the server to accept federation requests on  urls  - an array of urls of the form  http[s]:// ip-or-host [:port]  of other bus instances that this bus can federate to. default is an empty array.  poolSize  - the number of web sockets to keep open and idle at all times to federated bus instances. default is 10.  secret  - String|Function. if a string, the secret key to be shared among all bus instances that can federate to each other. if a function,\n               the federver will call it to determine if the client is to be accepted (read more about the function\n               behavior at https://github.com/websockets/ws/blob/master/doc/ws.md#optionsverifyclient). default is  notsosecret .  logger  - the logger that the bus should use  logLevel  - specify the bus log level. possible values are 'error', 'warning', 'info', 'debug'. default is 'error'   Call  connect  to connect to the redis instances and to open the federation server.", 
+            "title": "bus.create([options])"
+        }, 
+        {
+            "location": "/usage/#buswithloglog", 
+            "text": "Attach a logger to the bus instance. Returns the bus instance.", 
+            "title": "bus.withLog(log)"
+        }, 
+        {
+            "location": "/usage/#busdebugon", 
+            "text": "Turn on or off printing of debug messages to the log. default is off.", 
+            "title": "bus.debug(on)"
+        }, 
+        {
+            "location": "/usage/#busconnect", 
+            "text": "Connect to the redis servers and start the federation server (if one was specified). Once connected to all redis instances, the  online  will be emitted.\nIf the bus gets disconnected from the the redis instances, the  offline  event will be emitted.", 
+            "title": "bus.connect()"
+        }, 
+        {
+            "location": "/usage/#busdisconnect", 
+            "text": "Disconnect from the redis instances and stop the federation server. Once disconnected, the  offline  event will be emitted.", 
+            "title": "bus.disconnect()"
+        }, 
+        {
+            "location": "/usage/#busisonline", 
+            "text": "Return  true  if the bus is online,  false  if the bus offline.", 
+            "title": "bus.isOnline()"
+        }, 
+        {
+            "location": "/usage/#busqueuename", 
+            "text": "Create a new  Queue  instance.   name  - the name of the queue.   Returns a new Queue instance. Call  queue.attach  before using the queue.", 
+            "title": "bus.queue(name)"
+        }, 
+        {
+            "location": "/usage/#buschannelname-local-remote", 
+            "text": "Create a new  Channel  instance.   name  - the name of the channel.  local  - [optional] specifies the local role. default is  local .  remote  - [optional] specifies the remote role. default is  remote .", 
+            "title": "bus.channel(name [, local, remote])"
+        }, 
+        {
+            "location": "/usage/#buspubsubname", 
+            "text": "Create a new  Pubsub  instance.   name  - the name of the pubsub channel.   Returns a new Pubsub instance.", 
+            "title": "bus.pubsub(name)"
+        }, 
+        {
+            "location": "/usage/#buspersistifyname-object-properties", 
+            "text": "Create a new  Persistable  object. Persistifying an object adds additional methods to the persistified object.\nSee the  API for more details.   name  - the name of the persisted object.  object  - the object to persistify.  properties  - an array of property names to persist.", 
+            "title": "bus.persistify(name, object, properties)"
+        }, 
+        {
+            "location": "/usage/#busfederateobject-target", 
+            "text": "Federate  object  to the specified  target  instead of hosting the object on the local redis servers.\nDo not use any of the object API's before federation setup is complete.   object  -  queue ,  channel  or  persisted  objects to federate. These are created normally through  bus.queue ,  bus.channel  and  bus.persistify .  target  - the target bus url or an already open websocket to the target bus. The url has the form  http[s]:// location [: port ]", 
+            "title": "bus.federate(object, target)"
+        }, 
+        {
+            "location": "/usage/#bus-events", 
+            "text": "online  - emitted when the bus has successfully connected to all of the specified redis instances  offline  - emitted when the bus loses connections to the redis instances  error  - an error occurs", 
+            "title": "Bus Events"
+        }, 
+        {
+            "location": "/usage/#queue", 
+            "text": "A queue of messages.  Messages are pushed to the queue and consumed from it in they order that they were pushed.  Any number of clients can produce messages to a queue, and any number of consumers\ncan consume messages from a queue.", 
+            "title": "Queue"
+        }, 
+        {
+            "location": "/usage/#attach-and-detach", 
+            "text": "Pushing messages and consuming them requires attaching to the queue.\nThe queue will remain in existence for as long as it has at least one client attached to it.  To stop using a queue, detach from it. Once a queue has no more clients attached, it will automatically expire\nafter a predefined ttl (also losing any messages in it).", 
+            "title": "Attach and Detach"
+        }, 
+        {
+            "location": "/usage/#producing-messages", 
+            "text": "var Bus = require('busmq');\nvar bus = Bus.create({redis: ['redis://127.0.0.1:6379']});\nbus.on('online', function() {\n  var q = bus.queue('foo');\n  q.on('attached', function() {\n    console.log('attached to queue');\n  });\n  q.attach();\n  q.push({hello: 'world'});\n  q.push('my name if foo');\n});\nbus.connect();", 
+            "title": "Producing Messages"
+        }, 
+        {
+            "location": "/usage/#consuming-messages", 
+            "text": "var Bus = require('busmq');\nvar bus = Bus.create({redis: ['redis://127.0.0.1:6379']});\nbus.on('online', function() {\n  var q = bus.queue('foo');\n  q.on('attached', function() {\n    console.log('attached to queue. messages will soon start flowing in...');\n  });\n  q.on('message', function(message, id) {\n    if (message === 'my name if foo') {\n      q.detach();\n    }\n  });\n  q.attach();\n  q.consume(); // the 'message' event will be fired when a message is retrieved\n});\nbus.connect();", 
+            "title": "Consuming Messages"
+        }, 
+        {
+            "location": "/usage/#consumption-modes", 
+            "text": "There are three modes that messages can be consumed from a queue, with various degrees of\nflexibility for each mode.", 
+            "title": "Consumption Modes"
+        }, 
+        {
+            "location": "/usage/#unreliable-delivery", 
+            "text": "This is a  Zero-or-Once  message delivery mode, which is also the default mode.\nMessages are consumed from the queue by one consumer only and will not be consumed again by that consumer or any other consumer.\nThis method of consumption is unreliable in a sense that if the consumer crashes before being able to\nhandle the message, it is lost forever.  // consume with default settings\nq.consume();\n\n// this is the same as the default settings\nq.consume({reliable: false, remove: true});", 
+            "title": "Unreliable Delivery"
+        }, 
+        {
+            "location": "/usage/#reliable-delivery-guarantee-delivery", 
+            "text": "This is a  Once-or-More  message delivery mode, where it is guaranteed that messages will be delivered at least once.\nEvery consumed message enters a 'waiting for ack' state. The consumer should call 'ack' on a message in order to\nmark it as handled. When the client issues an 'ack' on the message, the message\nis permanently discarded from the queue and will not be consumed again.  If a client crashes when consuming in this mode, any messages that have not been ACKed will be delivered once more\nwhen a client starts to consume again.  Note:  This mode does not work well with multiple consumers. The behavior of multiple clients consuming in reliable\nmode from the same queue is undefined.  // consume message reliably. message with id 3 is the last acked message\nq.consume({reliable: true, last: 3});", 
+            "title": "Reliable Delivery (Guarantee Delivery)"
+        }, 
+        {
+            "location": "/usage/#persistent-publishsubscribe", 
+            "text": "This is a form of publish/subscribe, where all consumers receive all messages, even if they were not consuming at the time messages were\nbeing pushed to the queue. A consumer can also specify the index of the message to start consuming from.  This is different than regular publish/subscribe since persistent publish/subscribe utilizes message queues to store\nevery published message, whereas regular publish/subscribe does not store published messages at any time.  Be careful using Persistent publish/subscribe for long periods of time and many messages since the messages are stored\nin the queue for the entire existence of the queue. Misuse may lead to memory growth and an\neventual blowup of the redis server.  // consume message without removing them from the queue. start consuming from message at index 0.\nq.consume({remove: false, index: 0});", 
+            "title": "Persistent Publish/Subscribe"
+        }, 
+        {
+            "location": "/usage/#queueattachoptions", 
+            "text": "Attach to the queue. If the queue does not already exist it is created.\nOnce attached, the  attached  event is emitted.  Options:   ttl  - duration in seconds for the queue to live without any attachments. default is 30 seconds.  discoverable  - whether this queue should notify all the federating buses connected to this bus about this queue. \n                   finding a discoverable queue is performed using the  queue.find#  method. default is false.", 
+            "title": "queue.attach([options])"
+        }, 
+        {
+            "location": "/usage/#queuedetach", 
+            "text": "Detach from the queue. The queue will continue to live for as long as it has at least one attachment.\nOnce a queue has no more attachments, it will continue to exist for the predefined  ttl , or until it\nis attached to again.", 
+            "title": "queue.detach()"
+        }, 
+        {
+            "location": "/usage/#queuepushmessage-callback", 
+            "text": "Push a message to the queue. The message can be a JSON object or a string. \nThe message will remain in the queue until it is consumed by a consumer.   message  - the message to push  callback  - invoked after the message was actually pushed to the queue. receives  err  and the  id  of the pushed message", 
+            "title": "queue.push(message[, callback])"
+        }, 
+        {
+            "location": "/usage/#queueconsumeoptions", 
+            "text": "Start consuming messages from the queue.\nThe  message  event is emitted whenever a message is consumed from the queue.  Options:   max  if specified, only  max  messages will be consumed from the queue. If not specified,\nmessages will be continuously consumed as they are pushed into the queue.   remove  -  true  indicates to remove a read message from the queue, and  false  leaves it in the queue so that it may be read once more. default is  true . Note : The behavior of mixing consumers that remove messages with consumers that do not remove messages from the same queue is undefined.   reliable  - applicable only if  remove  is  true . indicates that every consumed message needs to be ACKed in order not to receive it again in case of\ncalling  consume  again. see  queue.ack  for ack details. default is  false .   last  - applicable only if  reliable  is  true . indicates the last message id that was ACKed so that only messages with higher id's should be received.\nif any messages still exist in the queue with id's lower than  last  they will be discarded.\nthis behaves exactly like calling  queue.ack  with the last id before starting to consume. default is 0.", 
+            "title": "queue.consume([options])"
+        }, 
+        {
+            "location": "/usage/#queueackid-callback", 
+            "text": "Specifies that the message with the specified id, and all messages with lower id's, can safely be discarded so that\nthey should never be consumed again. Ignored if not consuming in reliable mode.   id  - the message id to ack  callback  - invoked after the message was actually acked. receives  err .", 
+            "title": "queue.ack(id[, callback])"
+        }, 
+        {
+            "location": "/usage/#queueisconsumingcallback", 
+            "text": "Returns  true  if this client is consuming messages,  false  otherwise.   callback  - receives  err  and the consuming state", 
+            "title": "queue.isConsuming([callback])"
+        }, 
+        {
+            "location": "/usage/#queuestop", 
+            "text": "Stop consuming messages from the queue.", 
+            "title": "queue.stop()"
+        }, 
+        {
+            "location": "/usage/#queueclose", 
+            "text": "Closes the queue and destroys all messages. Emits the  closed  event once it is closed.", 
+            "title": "queue.close()"
+        }, 
+        {
+            "location": "/usage/#queueflushcallback", 
+            "text": "Empty the queue, removing all messages.   callback  - invoked after the queue was flushed. receives  err .", 
+            "title": "queue.flush([callback])"
+        }, 
+        {
+            "location": "/usage/#queueexistscallback", 
+            "text": "Checks if the queue exists in the local bus.   callback  - receives  err  and  result  with a value of  true  if the queue exists,  false  otherwise", 
+            "title": "queue.exists([callback])"
+        }, 
+        {
+            "location": "/usage/#queuefindcallback", 
+            "text": "Checks if the queue already exists in the local bus or a federated bus. Note that a queue can only be found\nif the federated bus has announced its existence to the federating buses. This is something that happens periodically\nduring the lifecycle of the queue, where the frequency depends on the ttl of the queue.\nNormally this method would be called before calling  queue.attach .   callback  - receives  err  and the  location  of the queue. \n   if the queue exists locally,  location  will be set to  local .\n   if the queue exists in a federated bus,  location  will be set to the url of the federated bus.\n   if the queue is not found,  location  is set to  null .", 
+            "title": "queue.find([callback])"
+        }, 
+        {
+            "location": "/usage/#queuecountcallback", 
+            "text": "Get the number if messages in the queue.   callback  - receives  err  and the number of messages in the queue", 
+            "title": "queue.count([callback])"
+        }, 
+        {
+            "location": "/usage/#queuettlcallback", 
+            "text": "Get the time in seconds for the queue to live without any attachments.   callback  - receives  err  and the ttl in seconds", 
+            "title": "queue.ttl([callback])"
+        }, 
+        {
+            "location": "/usage/#queuemetadatakey-value-callback", 
+            "text": "Get or set arbitrary metadata on the queue.\nWill set the metadata  key  to the provided  value , or get the current value of the key if the  value  parameter is not provided.   key  - the metadata key to set or get  value  - [optional] the value to set on the key.  callback  - receives  err  as the first argument. if setting a metadata value, it is called with no further arguments.\nif retrieving the value, it is called with the retrieved value.", 
+            "title": "queue.metadata(key [, value][, callback])"
+        }, 
+        {
+            "location": "/usage/#queuepushedcallback", 
+            "text": "Returns the number of messages pushed by this client to the queue   callback  - receives  err  and the number of pushed messages", 
+            "title": "queue.pushed([callback])"
+        }, 
+        {
+            "location": "/usage/#queueconsumedcallback", 
+            "text": "Returns the number of messages consumed by this client from the queue   callback  - receives  err  and the number of consumed messages", 
+            "title": "queue.consumed([callback])"
+        }, 
+        {
+            "location": "/usage/#queue-events", 
+            "text": "attaching  - emitted when starting to attach  attached  - emitted when attached to the queue. The listener callback receives  true  if the queue already exists\nand  false  if it was just created.  detaching  - emitted when starting to detach  detached  - emitted when detached from the queue. If no other clients are attached to the queue, the queue will remain alive for the  ttl  duration  consuming  - emitted when starting or stopping to consume messages from the queue. The listener callback will receive  true \nif starting to consume and  false  if stopping to consume.  message  - emitted when a message is consumed from the queue. The listener callback receives the message as a string and the id of the message as an integer.  error  - emitted when some error occurs. The listener callback receives the error.", 
+            "title": "Queue Events"
+        }, 
+        {
+            "location": "/usage/#channel", 
+            "text": "A bi-directional channel for peer-to-peer communication. Under the hood, a channel uses two message queues,\nwhere each peer pushes messages to one queue and consumes messages from the other queue.\nIt does not matter which peer connects to the channel first.  Each peer in the channel has a role. For all purposes roles are the same, except that the roles determine to which\nqueue messages will be pushed and from which queue they will be consumed. To peers to communicate over the channel, they must have opposite roles.  By default, a channel uses role  local  to consume messages and  remote  to push messages.\nSince peers must have opposite roles, if using the default roles, one peer must call  channel.listen  and the other peer must call  channel.connect .  It is also possible to specify other roles explicitly, such as  client  and  server .\nThis enables specifying the local role and the remote role, and just connecting the channel without calling  listen .\nSpecifying roles explicitly may add to readability, but not much more than that.  A channel supports the same consumption modes as a queue does. See  Consumption Modes  for details.", 
+            "title": "Channel"
+        }, 
+        {
+            "location": "/usage/#using-a-channel-default-roles", 
+            "text": "Server endpoint:  bus.on('online', function() {\n  var c = bus.channel('bar'); // use default names for the endpoints\n  c.on('connect', function() {\n    // connected to the channel\n  });\n  c.on('remote:connect', function() {\n    // the client is connected to the channel\n    c.send('hello client!');\n  });\n  c.on('message', function(message) {\n    // received a message from the client\n  });\n  c.listen(); // reverse the endpoint roles and connect to the channel\n});  Client endpoint:  bus.on('online', function() {\n  var c = bus.channel('bar'); // use default names for the endpoints\n  c.on('connect', function() {\n    // connected to the channel\n  });\n  c.on('remote:connect', function() {\n    // the server is connected to the channel\n    c.send('hello server!');\n  });\n  c.on('message', function(message) {\n    // received a message from the server\n  });\n  c.connect(); // connect to the channel\n});", 
+            "title": "Using a channel (default roles)"
+        }, 
+        {
+            "location": "/usage/#using-a-channel-explicit-roles", 
+            "text": "Server endpoint:  bus.on('online', function() {\n  // local role is server, remote role is client\n  var c = bus.channel('zoo', 'server', 'client');\n  c.on('connect', function() {\n    // connected to the channel\n  });\n  c.on('remote:connect', function() {\n    // the client is connected to the channel\n    c.send('hello client!');\n  });\n  c.on('message', function(message) {\n    // received a message from the client\n  });\n  c.connect(); // connect to the channel\n});  Client endpoint:  bus.on('online', function() {\n  // notice the reverse order of roles\n  // local role is client, remote role is server\n  var c = bus.channel('zoo', 'client', 'server');\n  c.on('connect', function() {\n    // connected to the channel\n  });\n  c.on('remote:connect', function() {\n    // the server is connected to the channel\n    c.send('hello server!');\n  });\n  c.on('message', function(message) {\n    // received a message from the server\n  });\n  c.connect(); // connect to the channel\n});", 
+            "title": "Using a channel (explicit roles)"
+        }, 
+        {
+            "location": "/usage/#channelconnect", 
+            "text": "Connects to the channel. The  connect  event is emitted once connected to the channel.", 
+            "title": "channel.connect()"
+        }, 
+        {
+            "location": "/usage/#channelattach", 
+            "text": "Alias to  channel.connect()", 
+            "title": "channel.attach()"
+        }, 
+        {
+            "location": "/usage/#channellisten", 
+            "text": "Connects to the channel with reverse semantics of the roles. \nThe  connect  event is emitted once connected to the channel.", 
+            "title": "channel.listen()"
+        }, 
+        {
+            "location": "/usage/#channelsendmessage-callback", 
+            "text": "Send a message to the peer. The peer does need to be connected for a message to be sent.   message  - the message to send  callback  - invoked after the message was actually pushed to the channel. receives  err  and the  id  of the pushed message", 
+            "title": "channel.send(message[, callback])"
+        }, 
+        {
+            "location": "/usage/#channelsendtoendpoint-message-callback", 
+            "text": "Send a message to the the specified endpoint. There is no need to connect to the channel with  channel.connect  or  channel.listen .   endpoint  - the target endpoint to receive the message  message  - the message to send  callback  - invoked after the message was actually pushed to the channel. receives  err  and the  id  of the pushed message", 
+            "title": "channel.sendTo(endpoint, message[, callback])"
+        }, 
+        {
+            "location": "/usage/#channeldisconnect", 
+            "text": "Disconnect from the channel. The channel remains open and a different peer can connect to it.", 
+            "title": "channel.disconnect()"
+        }, 
+        {
+            "location": "/usage/#channeldetach", 
+            "text": "Alias to  channel.disconnect()", 
+            "title": "channel.detach()"
+        }, 
+        {
+            "location": "/usage/#channelend", 
+            "text": "End the channel. No more messages can be pushed or consumed. This also caused the peer to disconnect from the channel and close the message queues.", 
+            "title": "channel.end()"
+        }, 
+        {
+            "location": "/usage/#channelackid-callback", 
+            "text": "See  queue.ack  for details", 
+            "title": "channel.ack(id[, callback])"
+        }, 
+        {
+            "location": "/usage/#channelisattachedcallback", 
+            "text": "Returns  true  if connected to the channel,  false  if not connected.", 
+            "title": "channel.isAttached([callback])"
+        }, 
+        {
+            "location": "/usage/#channel-events", 
+            "text": "connect  - emitted when connected to the channel  remote:connect  - emitted when a remote peer connects to the channel  disconnect  - emitted when disconnected from the channel  remote:disconnect  - emitted when the remote peer disconnects from the channel  message  - emitted when a message is received from the channel. The listener callback receives the message as a string.  end  - emitted when the remote peer ends the channel  error  - emitted when an error occurs. The listener callback receives the error.", 
+            "title": "Channel Events"
+        }, 
+        {
+            "location": "/usage/#persistable", 
+            "text": "It is possible to persist arbitrary objects to the bus.\nA persistable object defines a set of properties on the object that are tracked for modification. When\nsaving a dirty object (where dirty means that some tracked properties have changed) only those dirty properties are\npersisted to the bus. Loading a persistable object reads all of the persisted properties.  bus.on('online', function() {\n  var object = {field: 'this field is not persisted'};\n  var p = bus.persistify('obj', object, ['foo', 'bar', 'zoo']);\n  p.foo = 'hello';\n  p.bar = 1;\n  p.zoo = true;\n  p.save(function(err) {\n    // foo, bar and zoo fields have been saved\n  });\n\n  p.foo = 'world';\n  p.save(function(err) {\n    // only foo has been saved\n  });\n\n  // load the persistified properties\n  var p2 = bus.persistify('obj', {}, ['foo', 'bar', 'zoo']);\n  p2.load(function(err, exists) {\n    // exists == true\n    // p2.foo == 'world'\n    // p2.bar == 2\n    // p2.zpp == true'\n  });\n});", 
+            "title": "Persistable"
+        }, 
+        {
+            "location": "/usage/#persistablesavecallback", 
+            "text": "Save all the dirty properties. The dirty properties are marked as not dirty after the save completes.   callback  - called when the save has finished. receives  err  if there was an error.", 
+            "title": "persistable.save([callback])"
+        }, 
+        {
+            "location": "/usage/#persistableloadcallback", 
+            "text": "Load all the tracked properties. All properties are marked as not dirty after the load completes.   callback   - called when the load has finished. receives  err ,  exists  and  id \nwhere  exists  is true if the persisted object was found in the bus and  id  is the id of the object whose data was searched.", 
+            "title": "persistable.load([callback])"
+        }, 
+        {
+            "location": "/usage/#persistablepersistttl", 
+            "text": "Start a periodic timer to continuously mark the persisted object as being used.   ttl  specifies the number of seconds to keep the object alive in the bus.", 
+            "title": "persistable.persist(ttl)"
+        }, 
+        {
+            "location": "/usage/#persistableunpersist", 
+            "text": "Stop the periodic timer. This will cause object to expire after the defined ttl provided in the persist method.", 
+            "title": "persistable.unpersist()"
+        }, 
+        {
+            "location": "/usage/#publishsubscribe", 
+            "text": "A plain old publish/subscribe channel. These channels are not backed by queues, so any subscriber not subscribed at the\ntime a message is published will not receive the message.  Publish/Subscribe channel are always created on the first redis server in the list of redis servers\nthe bus is connected to. The reason for this is the time it would take to locate a publish/subscribe channel via the\nredis api were the channels distributed between all redis servers (it's O(N) where N is the number of subscribers).  bus.on('online', function() {\n  var s = bus.pubsub('my pubsub channel');\n  s.on('message', function(message) {\n    // received message 'hello world' on subscribed channel\n  });\n  s.subscribe();\n\n  var p = bus.pubsub('my pubsub channel');\n  p.publish('hello world');\n});", 
+            "title": "Publish/Subscribe"
+        }, 
+        {
+            "location": "/usage/#pubsubpublishmessage-callback", 
+            "text": "Publishes a message on the pubsub channel. Only currently subscribed clients will receive the message.   message  - the message to publish  callback  - invoked after the message was actually published. receives  err  if there was an error.  note: starting\nfrom version 1.5.0, the callback no longer receives the number of subscribers that received the message.", 
+            "title": "pubsub.publish(message[, callback])"
+        }, 
+        {
+            "location": "/usage/#pubsubsubscribe", 
+            "text": "Subscribes to message in the pubsub channel. Once a message is received, the  message  event will be emitted.", 
+            "title": "pubsub.subscribe()"
+        }, 
+        {
+            "location": "/usage/#pubsubunsubscribe", 
+            "text": "Unsubscribes from messages on the pubsub channel. Messages can still be published using the  publish  method.", 
+            "title": "pubsub.unsubscribe()"
+        }, 
+        {
+            "location": "/usage/#pubsubissubscribed", 
+            "text": "Returns  true  if subscribed to messages from the pubsub channel,  false  if not.", 
+            "title": "pubsub.isSubscribed()"
+        }, 
+        {
+            "location": "/usage/#pubsub-events", 
+            "text": "subscribed  - emitted when subscribed to messages on the pubsub channel  unsubscribed  - emitted when unsubscribing from the pubsub channel  message  - emitted when a message is received from the pubsub channel. The listener callback receives the message as a string.  error  - emitted when an error occurs. The listener callback receives the error.", 
+            "title": "Pubsub Events"
+        }, 
+        {
+            "location": "/usage/#federation", 
+            "text": "It is sometimes desirable to setup bus instances in different locations, where redis\nservers of one location are not directly accessible to other locations. This setup is very common\nwhen building a bus that spans several data centers, where each data center is isolated behind a firewall.  Federation enables using queues, channels and persisted objects of a bus without access to the redis servers themselves.\nWhen federating an object, the federating bus uses web sockets to the target bus as the federation channel,\nand the federated bus manages the object on its redis servers on behalf of the federating bus.\nThe federating bus does not host the federated objects on the local redis servers.  Federation is done over web sockets since they are firewall and proxy friendly.  The federating bus utilizes a simple pool of always-connected web sockets. When a bus is initialized, it\nspins up an fixed number of web sockets that connect to federated bus instances. When federating an object, the bus\nselects a web socket from the pool and starts federating the object over it.  The API and events of a federated objects are exactly the same as a non-federated objects. This is achieved\nusing the  dnode  module for RPCing the object API.", 
+            "title": "Federation"
+        }, 
+        {
+            "location": "/usage/#opening-a-bus-with-a-federation-server", 
+            "text": "// this server is running on 192.168.0.1\nvar http = require('http');\nvar httpServer = http.createServer(); // create the http server to serve as the federation server. you can also use express if you like...\nhttpServer.listen(8881);\nvar Bus = require('busmq');\nvar options = {\n  redis: 'redis://127.0.0.1', // connect this bus to a local running redis\n  federate: { // also open a federation server\n    server: httpServer,  // use the provided http server as the federation server\n    secret: 'mysecret',   // a secret key for authorizing clients\n    path: '/my/fed/path' // the federation service is accessible on this path in the server\n  }\n};\nvar bus = Bus.create(options);\nbus.on('online', function() {\n  // the bus is now ready to receive federation requests\n});\nbus.connect();", 
+            "title": "Opening a bus with a federation server"
+        }, 
+        {
+            "location": "/usage/#federating-a-queue", 
+            "text": "var Bus = require('busmq');\nvar options = {\n  federate: { // connect to a federate bus\n    poolSize: 5, // keep the pool size with 5 web sockets\n    urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url\n    secret: 'mysecret'  // the secret key to authorize with the federation server\n  }\n};\nvar bus = Bus.create(options);\nbus.on('online', function() {\n // federate the queue to a bus located at a different data center\n var fed = bus.federate(bus.queue('foo'), 'http://192.168.0.1:8881/my/fed/path');\n fed.on('ready', function(q) {\n   // federation is ready - we can start using the queue\n   q.on('attached', function() {\n     // do whatever\n   });\n   q.attach();\n });\n});\nbus.connect();", 
+            "title": "Federating a queue"
+        }, 
+        {
+            "location": "/usage/#finding-a-queue", 
+            "text": "It is possible to find a queue that exists in a federated bus. \nNote that a queue can only be found if the federated bus has announced its existence to the federating buses. \nThis is something that happens periodically during the lifecycle of the queue, where the announcement frequency \ndepends on the ttl of the queue (frequency is ttl/3)", 
+            "title": "Finding a queue"
+        }, 
+        {
+            "location": "/usage/#making-a-queue-discoverable", 
+            "text": "// a queue named 'foo' is created in the federated bus at http://192.168.0.1:8881 and is made discoverable\n var queue = bus.queue('foo');\n queue.attach({discoverable: true});", 
+            "title": "Making a queue discoverable"
+        }, 
+        {
+            "location": "/usage/#finding-the-discoverable-queue", 
+            "text": "// find the queue named 'foo'\n  var queue = bus.queue('foo');\n  queue.find(function(err, location) {\n    console.log(location === 'http://192.168.0.1:8881/my/fed/path'); // will print 'true'\n    // we can now federate the queue\n    var fed = bus.federate(queue, location);\n  });", 
+            "title": "Finding the discoverable queue"
+        }, 
+        {
+            "location": "/usage/#federating-a-channel", 
+            "text": "var Bus = require('busmq');\nvar options = {\n  federate: { // connect to a federate bus\n    poolSize: 5, // keep the pool size with 5 web sockets\n    urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url\n    secret: 'mysecret'  // the secret key to authorize with the federation server\n  }\n};\nvar bus = Bus.create(options);\nbus.on('online', function() {\n // federate the channel to a bus located at a different data center\n var fed = bus.federate(bus.channel('bar'), 'http://192.168.0.1:8881/my/fed/path');\n fed.on('ready', function(c) {\n   // federation is ready - we can start using the channel\n   c.on('message', function(message) {\n     // do whatever\n   });\n   c.attach();\n });\n});\nbus.connect();", 
+            "title": "Federating a channel"
+        }, 
+        {
+            "location": "/usage/#federating-a-persistable-object", 
+            "text": "var Bus = require('busmq');\nvar options = {\n  federate: { // connect to a federate bus\n    poolSize: 5, // keep the pool size with 5 web sockets\n    urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url\n    secret: 'mysecret'  // the secret key to authorize with the federation server\n  }\n};\nvar bus = Bus.create(options);\nbus.on('online', function() {\n // federate the persistent object to a bus located at a different data center\n var fed = bus.federate(bus.persistify('bar', object, ['field1', 'field2']), 'http://192.168.0.1:8881/my/fed/path');\n fed.on('ready', function(p) {\n   // federation is ready - we can start using the persisted object\n   p.load(function(err, exists) {\n     // do whatever\n   });\n });\n});\nbus.connect();", 
+            "title": "Federating a persistable object"
+        }, 
+        {
+            "location": "/usage/#federating-a-pubsub", 
+            "text": "var Bus = require('busmq');\nvar options = {\n  federate: { // also connect to a federate bus\n    poolSize: 5, // keep the pool size with 5 web sockets\n    urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url\n    secret: 'mysecret'  // the secret ket to authorize with the federation server\n  }\n};\nvar bus = Bus.create(options);\nbus.on('online', function() {\n // federate the channel to a bus located at a different data center\n var fed = bus.federate(bus.pubsub('bar'), 'http://192.168.0.1:8881/my/fed/path');\n fed.on('ready', function(p) {\n   // federation is ready - we can start using pubsub\n   p.on('message', function(message) {\n     // do whatever\n   });\n   p.subscribe();\n   p.publish('foo bar');\n });\n});\nbus.connect();", 
+            "title": "Federating a pubsub"
+        }, 
+        {
+            "location": "/usage/#federateclosedisconnect", 
+            "text": "Close the federation object.   disconnect  - true to disconnect the underlying websocket", 
+            "title": "federate.close(disconnect)"
+        }, 
+        {
+            "location": "/usage/#federate-events", 
+            "text": "ready  - emitted when the federation setup is ready. The callback receives the bus object to use.  unauthorized  - incorrect secret key was used to authenticate with the federation server  reconnecting  - the federation connection was disconnected and is now reconnecting  reconnected  - the federation connection has successfully reconnected  close  - the federation connection closed permanently  error  - some error occurred. the callback receives the  error  message", 
+            "title": "Federate Events"
+        }, 
+        {
+            "location": "/usage/#browser-support", 
+            "text": "Browser support is achieved through the use of federation to the bus server over native browser websockets. \nThe following API is only available from a browser connecting to a federation server.\nIt enables the use of queues, channels and persisted objects.", 
+            "title": "Browser Support"
+        }, 
+        {
+            "location": "/usage/#how-to-build", 
+            "text": "Generating the latest  busmq.js  and  busmq.min.js  files requires cloning the git repo.  git clone https://github.com/capriza/node-busmq.git\ncd node-busmq\nnpm install\nnpm run browser", 
+            "title": "How to Build"
+        }, 
+        {
+            "location": "/usage/#usage_1", 
+            "text": "script src= busmq.min.js /script  script \n  // connect to the bus running a federation server on port 8080 and with secret 'notsosecret'\n  var bus = busmq('ws://localhost:8080/', 'notsosecret');\n\n  // create a queue object named 'foo'.\n  // the queue will be created in the bus and the callback will be invoked when the queue is ready\n  bus.queue('foo', function(err, q) {\n    if (err) {\n      console.log('bus: error ' + err);\n      return;\n    }\n    console.log('bus: q ready');\n    q.on('attached', function() {\n      console.log('bus: queue attached');\n      // push 5 messages to the queue\n      for (var i = 0; i   5; ++i) {\n        q.push('message number ' + i);\n      }\n    });\n    q.on('message', function(message, id) {\n      // 5 messages should be received\n      console.log('got bus message ' + id + ': ' + message);\n    });\n    // attach to the queue and consume messages from it\n    q.attach();\n    q.consume();\n  }); /script", 
+            "title": "Usage"
+        }, 
+        {
+            "location": "/usage/#busmqurl-secret", 
+            "text": "Connect to the federation server a of running bus.\nReturns a  Bus  object.   url  - the url of the bus federation server. the protocol must be  ws  or  wss .  secret  - the federation server secret", 
+            "title": "busmq(url, secret)"
+        }, 
+        {
+            "location": "/usage/#busqueuename-cb", 
+            "text": "Create a federated  queue  object.   name  - queue name  cb  - callback invoked when the federated object is ready. the callback format is  function(err, queue) .", 
+            "title": "bus.queue(name, cb)"
+        }, 
+        {
+            "location": "/usage/#buschannelname-local-remote-cb", 
+            "text": "Create a federated  channel  object.   name  - channel name  local  - local role  remote  - remote role  cb  - callback invoked when the federated object is ready. the callback format is  function(err, channel) .", 
+            "title": "bus.channel(name, local, remote, cb)"
+        }, 
+        {
+            "location": "/usage/#buspubsubname-cb", 
+            "text": "Create a federated  pubsub  object.   name  - queue name  cb  - callback invoked when the federated object is ready. the callback format is  function(err, pubsub) .", 
+            "title": "bus.pubsub(name, cb)"
+        }, 
+        {
+            "location": "/usage/#buspersistifyname-object-attributes-cb", 
+            "text": "Create a federated  persistable  object.   name  - channel name  object  - the object to persistify  attributes  - object attributes to persist  cb  - callback invoked when the federated object is ready. the callback format is  function(err, persisted) .", 
+            "title": "bus.persistify(name, object, attributes, cb)"
+        }, 
+        {
+            "location": "/performance/", 
+            "text": "Performance\n\uf0c1\n\n\nPerformance benchmark vs RabbitMQ.\n\n\n\n\nPerformance was measured with two key indicators in mind:\n\n\n\n\nMessage Throughput - the number of messages per second that can be pushed and consumed from a queue\n\n\nMessage Throughout Consistency - how consistent the throughput is over time\n\n\n\n\nThere is also a third indicator that might be interesting to examine and that is \"Queue Open/Close Throughout\".\nI'm pretty sure there's place for improvement there, so no benchmarking was performed in that area.\n\n\nThe Environment\n\uf0c1\n\n\nThe benchmark was performed on two \nc3.xlarge AWS machines\n running Debian 7.\nEach machine has 4 Intel(R) Xeon(R) CPU E5-2680 v2 @ 2.80GHz and 7.5GB of RAM.\n\n\nOne machine was setup to run 4 instances of redis 2.8.19. Redis is single threaded so it can only utilize one CPU.\n\n\nA second machine was setup to run 4 node busmq processes executing the benchmarking code.\nEach one of the 4 node processes connected to all of the 4 redis instances running on the first machine.\n\n\nBenchmark Flow\n\uf0c1\n\n\nThe benchmark flow is as follows:\n\n\n\n\nstart up 4 node processes (one per cpu)\n\n\non startup, the node process creates 100 queues\n\n\nonce all the nodes of all the processes have been created, every process performs:\n\n\ninitiate a report cycle of 2 seconds\n\n\npush/consume 32 byte messages as fast as possible to/from all queues\n\n\nreport the number of pushed and consumed messages per cycle\n\n\nreset the pushed and consumed message counters at the end of every cycle\n\n\nrun a total of 100 cycles\n\n\n\n\nResults\n\uf0c1\n\n\nBenchmarks are only good for what they actually measure.\nThere are always use cases that do no align with the results so be careful with any conclusions.\nIt's advised to perform your own performance tests with \nyour\n use cases and setups in mind.\n\n\nOn average, the benchmark shows every second about 10400 messages were pushed and 9973 messages were consumed.\nIt is also apparent that the push/consume throughput is quite consistent over time.\n(The X-axis shows the cycle number, the Y-axis shows the number of messages)\n\n\n\n\nAdditional testing indicates that the size of the messages has little to no impact on the throughput.\nHowever, increasing the number of queues by an order of magnitude does effect the performance.", 
+            "title": "Performance"
+        }, 
+        {
+            "location": "/performance/#performance", 
+            "text": "Performance benchmark vs RabbitMQ.   Performance was measured with two key indicators in mind:   Message Throughput - the number of messages per second that can be pushed and consumed from a queue  Message Throughout Consistency - how consistent the throughput is over time   There is also a third indicator that might be interesting to examine and that is \"Queue Open/Close Throughout\".\nI'm pretty sure there's place for improvement there, so no benchmarking was performed in that area.", 
+            "title": "Performance"
+        }, 
+        {
+            "location": "/performance/#the-environment", 
+            "text": "The benchmark was performed on two  c3.xlarge AWS machines  running Debian 7.\nEach machine has 4 Intel(R) Xeon(R) CPU E5-2680 v2 @ 2.80GHz and 7.5GB of RAM.  One machine was setup to run 4 instances of redis 2.8.19. Redis is single threaded so it can only utilize one CPU.  A second machine was setup to run 4 node busmq processes executing the benchmarking code.\nEach one of the 4 node processes connected to all of the 4 redis instances running on the first machine.", 
+            "title": "The Environment"
+        }, 
+        {
+            "location": "/performance/#benchmark-flow", 
+            "text": "The benchmark flow is as follows:   start up 4 node processes (one per cpu)  on startup, the node process creates 100 queues  once all the nodes of all the processes have been created, every process performs:  initiate a report cycle of 2 seconds  push/consume 32 byte messages as fast as possible to/from all queues  report the number of pushed and consumed messages per cycle  reset the pushed and consumed message counters at the end of every cycle  run a total of 100 cycles", 
+            "title": "Benchmark Flow"
+        }, 
+        {
+            "location": "/performance/#results", 
+            "text": "Benchmarks are only good for what they actually measure.\nThere are always use cases that do no align with the results so be careful with any conclusions.\nIt's advised to perform your own performance tests with  your  use cases and setups in mind.  On average, the benchmark shows every second about 10400 messages were pushed and 9973 messages were consumed.\nIt is also apparent that the push/consume throughput is quite consistent over time.\n(The X-axis shows the cycle number, the Y-axis shows the number of messages)   Additional testing indicates that the size of the messages has little to no impact on the throughput.\nHowever, increasing the number of queues by an order of magnitude does effect the performance.", 
+            "title": "Results"
+        }, 
+        {
+            "location": "/license/", 
+            "text": "License\n\uf0c1\n\n\nThe MIT License\n\n\n\n\nCopyright (c) 2015-2017 Capriza Inc.\n\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.", 
+            "title": "License"
+        }, 
+        {
+            "location": "/license/#license", 
+            "text": "The MIT License   Copyright (c) 2015-2017 Capriza Inc.  Permission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:  The above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.  THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.", 
+            "title": "License"
+        }
+    ]
+}

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Performance - BusMQ</title>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <link href="../css/extra.css" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+	
+	<script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="..">BusMQ</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                    <li >
+                        <a href="../usage/">Usage</a>
+                    </li>
+                    <li class="active">
+                        <a href="./">Performance</a>
+                    </li>
+                    <li >
+                        <a href="../license/">License</a>
+                    </li>
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="../usage/">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../license/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/capriza/node-busmq">
+                                <i class="fa fa-github"></i>GitHub
+                        </a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#performance">Performance</a></li>
+            <li><a href="#the-environment">The Environment</a></li>
+            <li><a href="#benchmark-flow">Benchmark Flow</a></li>
+            <li><a href="#results">Results</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h1 id="performance">Performance<a class="headerlink" href="#performance" title="Permanent link"></a></h1>
+<p>Performance benchmark vs RabbitMQ.</p>
+<hr />
+<p>Performance was measured with two key indicators in mind:</p>
+<ul>
+<li>Message Throughput - the number of messages per second that can be pushed and consumed from a queue</li>
+<li>Message Throughout Consistency - how consistent the throughput is over time</li>
+</ul>
+<p>There is also a third indicator that might be interesting to examine and that is "Queue Open/Close Throughout".
+I'm pretty sure there's place for improvement there, so no benchmarking was performed in that area.</p>
+<h2 id="the-environment">The Environment<a class="headerlink" href="#the-environment" title="Permanent link"></a></h2>
+<p>The benchmark was performed on two <a href="http://aws.amazon.com/ec2/instance-types/">c3.xlarge AWS machines</a> running Debian 7.
+Each machine has 4 Intel(R) Xeon(R) CPU E5-2680 v2 @ 2.80GHz and 7.5GB of RAM.</p>
+<p>One machine was setup to run 4 instances of redis 2.8.19. Redis is single threaded so it can only utilize one CPU.</p>
+<p>A second machine was setup to run 4 node busmq processes executing the benchmarking code.
+Each one of the 4 node processes connected to all of the 4 redis instances running on the first machine.</p>
+<h2 id="benchmark-flow">Benchmark Flow<a class="headerlink" href="#benchmark-flow" title="Permanent link"></a></h2>
+<p>The benchmark flow is as follows:</p>
+<ul>
+<li>start up 4 node processes (one per cpu)</li>
+<li>on startup, the node process creates 100 queues</li>
+<li>once all the nodes of all the processes have been created, every process performs:</li>
+<li>initiate a report cycle of 2 seconds</li>
+<li>push/consume 32 byte messages as fast as possible to/from all queues</li>
+<li>report the number of pushed and consumed messages per cycle</li>
+<li>reset the pushed and consumed message counters at the end of every cycle</li>
+<li>run a total of 100 cycles</li>
+</ul>
+<h2 id="results">Results<a class="headerlink" href="#results" title="Permanent link"></a></h2>
+<p>Benchmarks are only good for what they actually measure.
+There are always use cases that do no align with the results so be careful with any conclusions.
+It's advised to perform your own performance tests with <em>your</em> use cases and setups in mind.</p>
+<p>On average, the benchmark shows every second about 10400 messages were pushed and 9973 messages were consumed.
+It is also apparent that the push/consume throughput is quite consistent over time.
+(The X-axis shows the cycle number, the Y-axis shows the number of messages)</p>
+<p><img alt="Benchmark results" src="../img/busmq-benchmark.png" /></p>
+<p>Additional testing indicates that the size of the messages has little to no impact on the throughput.
+However, increasing the number of queues by an order of magnitude does effect the performance.</p></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2017 <a href="https://www.capriza.com">Capriza, Inc.</a></p>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+        <script src="../js/base.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

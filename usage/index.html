@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Usage - BusMQ</title>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <link href="../css/extra.css" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+	
+	<script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="..">BusMQ</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="..">Home</a>
+                    </li>
+                    <li class="active">
+                        <a href="./">Usage</a>
+                    </li>
+                    <li >
+                        <a href="../performance/">Performance</a>
+                    </li>
+                    <li >
+                        <a href="../license/">License</a>
+                    </li>
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="..">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../performance/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/capriza/node-busmq">
+                                <i class="fa fa-github"></i>GitHub
+                        </a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#usage">Usage</a></li>
+            <li><a href="#bus">Bus</a></li>
+            <li><a href="#queue">Queue</a></li>
+            <li><a href="#channel">Channel</a></li>
+            <li><a href="#persistable">Persistable</a></li>
+            <li><a href="#publishsubscribe">Publish/Subscribe</a></li>
+            <li><a href="#federation">Federation</a></li>
+            <li><a href="#browser-support">Browser Support</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h1 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link"></a></h1>
+<p>How to use BusMQ</p>
+<hr />
+<h2 id="bus">Bus<a class="headerlink" href="#bus" title="Permanent link"></a></h2>
+<p>The bus holds connections to one or more redis instances and is used
+to create <code>queue</code>s, <code>channel</code>s, <code>pubsub</code>s and <code>persistent</code> objects.</p>
+<p>Node processes connecting to the same bus have access to and can use all queues, channels pubsubs and persistent objects.</p>
+<p>busmq uses by default <a href="https://github.com/mranney/node_redis">node_redis</a> as the communication driver,
+but ioredis may also be used, and in fact is mandatory when connecting to a cluster or sentinels.
+Use the <code>driver</code> option when creating the bus instance.</p>
+<p>If the redis server requires an authentication password, specify it in auth part of the redis connection url.</p>
+<pre><code>var Bus = require('busmq');
+
+var bus = Bus.create({redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});
+// or specify the node-redis driver explicitly
+// var bus = Bus.create({driver: 'node-redis', redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});
+// or specify the ioredis driver explicitly
+// var bus = Bus.create({driver: 'ioredis', redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});
+// or specify the ioredis driver and cluster
+// var bus = Bus.create({driver: 'ioredis', layout: 'cluster', redis: ['redis://192.168.0.1:6379', 'redis://authpass@192.168.0.2:6379']});
+// or specify the ioredis driver and sentinels
+// var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: ['redis://192.168.0.1:26379']});
+
+bus.on('error', function(err) {
+  // an error has occurred
+});
+bus.on('online', function() {
+  // the bus is online - we can use queues, channels ans persistent objects
+});
+bus.on('offline', function() {
+  // the bus is offline - redis is down...
+});
+
+// connect the redis instances
+bus.connect();
+</code></pre>
+
+<h3 id="buscreateoptions">bus.create([options])<a class="headerlink" href="#buscreateoptions" title="Permanent link"></a></h3>
+<p>Create a new bus instance.</p>
+<ul>
+<li><code>driver</code> -  specify the redis connection driver to use.
+              This should be either <code>node-redis</code> or <code>ioredis</code>. The default is <code>node-redis</code></li>
+<li><code>layout</code> - specifies the type of redis setup to connect to. This should be one of <code>direct</code>, <code>cluster</code> or <code>sentinels</code>.
+             The default is <code>direct</code>.</li>
+<li><code>redis</code> -  specifies the redis servers to connect to. Can be a string or an array of string urls.
+             A valid url has the form <code>redis://[auth_pass@]&lt;host_or_ip&gt;[:port]</code>.</li>
+<li><code>federate</code> - an object defining federation options:</li>
+<li><code>server</code> -  an http/https server object to listen for incoming federation connections. if undefined then federation server will not be open</li>
+<li><code>path</code> - the path within the server to accept federation requests on</li>
+<li><code>urls</code> - an array of urls of the form <code>http[s]://&lt;ip-or-host&gt;[:port]</code> of other bus instances that this bus can federate to. default is an empty array.</li>
+<li><code>poolSize</code> - the number of web sockets to keep open and idle at all times to federated bus instances. default is 10.</li>
+<li><code>secret</code> - String|Function. if a string, the secret key to be shared among all bus instances that can federate to each other. if a function,
+               the federver will call it to determine if the client is to be accepted (read more about the function
+               behavior at https://github.com/websockets/ws/blob/master/doc/ws.md#optionsverifyclient). default is <code>notsosecret</code>.</li>
+<li><code>logger</code> - the logger that the bus should use</li>
+<li><code>logLevel</code> - specify the bus log level. possible values are 'error', 'warning', 'info', 'debug'. default is 'error'</li>
+</ul>
+<p>Call <code>connect</code> to connect to the redis instances and to open the federation server.</p>
+<h3 id="buswithloglog">bus.withLog(log)<a class="headerlink" href="#buswithloglog" title="Permanent link"></a></h3>
+<p>Attach a logger to the bus instance. Returns the bus instance.</p>
+<h3 id="busdebugon">bus.debug(on)<a class="headerlink" href="#busdebugon" title="Permanent link"></a></h3>
+<p>Turn on or off printing of debug messages to the log. default is off.</p>
+<h3 id="busconnect">bus.connect()<a class="headerlink" href="#busconnect" title="Permanent link"></a></h3>
+<p>Connect to the redis servers and start the federation server (if one was specified). Once connected to all redis instances, the <code>online</code> will be emitted.
+If the bus gets disconnected from the the redis instances, the <code>offline</code> event will be emitted.</p>
+<h3 id="busdisconnect">bus.disconnect()<a class="headerlink" href="#busdisconnect" title="Permanent link"></a></h3>
+<p>Disconnect from the redis instances and stop the federation server. Once disconnected, the <code>offline</code> event will be emitted.</p>
+<h3 id="busisonline">bus.isOnline()<a class="headerlink" href="#busisonline" title="Permanent link"></a></h3>
+<p>Return <code>true</code> if the bus is online, <code>false</code> if the bus offline.</p>
+<h3 id="busqueuename">bus.queue(name)<a class="headerlink" href="#busqueuename" title="Permanent link"></a></h3>
+<p>Create a new <a href="#queue">Queue</a> instance.</p>
+<ul>
+<li><code>name</code> - the name of the queue.</li>
+</ul>
+<p>Returns a new Queue instance. Call <code>queue.attach</code> before using the queue.</p>
+<h3 id="buschannelname-local-remote">bus.channel(name [, local, remote])<a class="headerlink" href="#buschannelname-local-remote" title="Permanent link"></a></h3>
+<p>Create a new <a href="#channel">Channel</a> instance.</p>
+<ul>
+<li><code>name</code> - the name of the channel.</li>
+<li><code>local</code> - [optional] specifies the local role. default is <code>local</code>.</li>
+<li><code>remote</code> - [optional] specifies the remote role. default is <code>remote</code>.</li>
+</ul>
+<h3 id="buspubsubname">bus.pubsub(name)<a class="headerlink" href="#buspubsubname" title="Permanent link"></a></h3>
+<p>Create a new <a href="#pubsub">Pubsub</a> instance.</p>
+<ul>
+<li><code>name</code> - the name of the pubsub channel.</li>
+</ul>
+<p>Returns a new Pubsub instance.</p>
+<h3 id="buspersistifyname-object-properties">bus.persistify(name, object, properties)<a class="headerlink" href="#buspersistifyname-object-properties" title="Permanent link"></a></h3>
+<p>Create a new <a href="#persistable">Persistable</a> object. Persistifying an object adds additional methods to the persistified object.
+See the  API for more details.</p>
+<ul>
+<li><code>name</code> - the name of the persisted object.</li>
+<li><code>object</code> - the object to persistify.</li>
+<li><code>properties</code> - an array of property names to persist.</li>
+</ul>
+<h3 id="busfederateobject-target">bus.federate(object, target)<a class="headerlink" href="#busfederateobject-target" title="Permanent link"></a></h3>
+<p>Federate <code>object</code> to the specified <code>target</code> instead of hosting the object on the local redis servers.
+Do not use any of the object API's before federation setup is complete.</p>
+<ul>
+<li><code>object</code> - <code>queue</code>, <code>channel</code> or <code>persisted</code> objects to federate. These are created normally through <code>bus.queue</code>, <code>bus.channel</code> and <code>bus.persistify</code>.</li>
+<li><code>target</code> - the target bus url or an already open websocket to the target bus. The url has the form <code>http[s]://&lt;location&gt;[:&lt;port&gt;]</code></li>
+</ul>
+<h3 id="bus-events">Bus Events<a class="headerlink" href="#bus-events" title="Permanent link"></a></h3>
+<ul>
+<li><code>online</code> - emitted when the bus has successfully connected to all of the specified redis instances</li>
+<li><code>offline</code> - emitted when the bus loses connections to the redis instances</li>
+<li><code>error</code> - an error occurs</li>
+</ul>
+<h2 id="queue">Queue<a class="headerlink" href="#queue" title="Permanent link"></a></h2>
+<p>A queue of messages.</p>
+<p>Messages are pushed to the queue and consumed from it in they order that they were pushed.</p>
+<p>Any number of clients can produce messages to a queue, and any number of consumers
+can consume messages from a queue.</p>
+<h3 id="attach-and-detach">Attach and Detach<a class="headerlink" href="#attach-and-detach" title="Permanent link"></a></h3>
+<p>Pushing messages and consuming them requires attaching to the queue.
+The queue will remain in existence for as long as it has at least one client attached to it.</p>
+<p>To stop using a queue, detach from it. Once a queue has no more clients attached, it will automatically expire
+after a predefined ttl (also losing any messages in it).</p>
+<h3 id="producing-messages">Producing Messages<a class="headerlink" href="#producing-messages" title="Permanent link"></a></h3>
+<pre><code>var Bus = require('busmq');
+var bus = Bus.create({redis: ['redis://127.0.0.1:6379']});
+bus.on('online', function() {
+  var q = bus.queue('foo');
+  q.on('attached', function() {
+    console.log('attached to queue');
+  });
+  q.attach();
+  q.push({hello: 'world'});
+  q.push('my name if foo');
+});
+bus.connect();
+</code></pre>
+
+<h3 id="consuming-messages">Consuming Messages<a class="headerlink" href="#consuming-messages" title="Permanent link"></a></h3>
+<pre><code>var Bus = require('busmq');
+var bus = Bus.create({redis: ['redis://127.0.0.1:6379']});
+bus.on('online', function() {
+  var q = bus.queue('foo');
+  q.on('attached', function() {
+    console.log('attached to queue. messages will soon start flowing in...');
+  });
+  q.on('message', function(message, id) {
+    if (message === 'my name if foo') {
+      q.detach();
+    }
+  });
+  q.attach();
+  q.consume(); // the 'message' event will be fired when a message is retrieved
+});
+bus.connect();
+</code></pre>
+
+<h3 id="consumption-modes">Consumption Modes<a class="headerlink" href="#consumption-modes" title="Permanent link"></a></h3>
+<p>There are three modes that messages can be consumed from a queue, with various degrees of
+flexibility for each mode.</p>
+<h4 id="unreliable-delivery">Unreliable Delivery<a class="headerlink" href="#unreliable-delivery" title="Permanent link"></a></h4>
+<p>This is a <em>Zero-or-Once</em> message delivery mode, which is also the default mode.
+Messages are consumed from the queue by one consumer only and will not be consumed again by that consumer or any other consumer.
+This method of consumption is unreliable in a sense that if the consumer crashes before being able to
+handle the message, it is lost forever.</p>
+<pre><code class="javascript">// consume with default settings
+q.consume();
+
+// this is the same as the default settings
+q.consume({reliable: false, remove: true});
+</code></pre>
+
+<h4 id="reliable-delivery-guarantee-delivery">Reliable Delivery (Guarantee Delivery)<a class="headerlink" href="#reliable-delivery-guarantee-delivery" title="Permanent link"></a></h4>
+<p>This is a <em>Once-or-More</em> message delivery mode, where it is guaranteed that messages will be delivered at least once.
+Every consumed message enters a 'waiting for ack' state. The consumer should call 'ack' on a message in order to
+mark it as handled. When the client issues an 'ack' on the message, the message
+is permanently discarded from the queue and will not be consumed again.</p>
+<p>If a client crashes when consuming in this mode, any messages that have not been ACKed will be delivered once more
+when a client starts to consume again.</p>
+<p><em>Note:</em> This mode does not work well with multiple consumers. The behavior of multiple clients consuming in reliable
+mode from the same queue is undefined.</p>
+<pre><code>// consume message reliably. message with id 3 is the last acked message
+q.consume({reliable: true, last: 3});
+</code></pre>
+
+<h4 id="persistent-publishsubscribe">Persistent Publish/Subscribe<a class="headerlink" href="#persistent-publishsubscribe" title="Permanent link"></a></h4>
+<p>This is a form of publish/subscribe, where all consumers receive all messages, even if they were not consuming at the time messages were
+being pushed to the queue. A consumer can also specify the index of the message to start consuming from.</p>
+<p>This is different than regular publish/subscribe since persistent publish/subscribe utilizes message queues to store
+every published message, whereas regular publish/subscribe does not store published messages at any time.</p>
+<p>Be careful using Persistent publish/subscribe for long periods of time and many messages since the messages are stored
+in the queue for the entire existence of the queue. Misuse may lead to memory growth and an
+eventual blowup of the redis server.</p>
+<pre><code>// consume message without removing them from the queue. start consuming from message at index 0.
+q.consume({remove: false, index: 0});
+</code></pre>
+
+<h3 id="queueattachoptions">queue.attach([options])<a class="headerlink" href="#queueattachoptions" title="Permanent link"></a></h3>
+<p>Attach to the queue. If the queue does not already exist it is created.
+Once attached, the <code>attached</code> event is emitted.</p>
+<p>Options:</p>
+<ul>
+<li><code>ttl</code> - duration in seconds for the queue to live without any attachments. default is 30 seconds.</li>
+<li><code>discoverable</code> - whether this queue should notify all the federating buses connected to this bus about this queue. 
+                   finding a discoverable queue is performed using the <code>queue.find#</code> method. default is false.</li>
+</ul>
+<h3 id="queuedetach">queue.detach()<a class="headerlink" href="#queuedetach" title="Permanent link"></a></h3>
+<p>Detach from the queue. The queue will continue to live for as long as it has at least one attachment.
+Once a queue has no more attachments, it will continue to exist for the predefined <code>ttl</code>, or until it
+is attached to again.</p>
+<h3 id="queuepushmessage-callback">queue.push(message[, callback])<a class="headerlink" href="#queuepushmessage-callback" title="Permanent link"></a></h3>
+<p>Push a message to the queue. The message can be a JSON object or a string. 
+The message will remain in the queue until it is consumed by a consumer.</p>
+<ul>
+<li><code>message</code> - the message to push</li>
+<li><code>callback</code> - invoked after the message was actually pushed to the queue. receives <code>err</code> and the <code>id</code> of the pushed message</li>
+</ul>
+<h3 id="queueconsumeoptions">queue.consume([options])<a class="headerlink" href="#queueconsumeoptions" title="Permanent link"></a></h3>
+<p>Start consuming messages from the queue.
+The <code>message</code> event is emitted whenever a message is consumed from the queue.</p>
+<p>Options:
+<em> <code>max</code> if specified, only <code>max</code> messages will be consumed from the queue. If not specified,
+messages will be continuously consumed as they are pushed into the queue.
+</em> <code>remove</code> - <code>true</code> indicates to remove a read message from the queue, and <code>false</code> leaves it in the queue so that it may be read once more. default is <code>true</code>.
+<em>Note</em>: The behavior of mixing consumers that remove messages with consumers that do not remove messages from the same queue is undefined.
+<em> <code>reliable</code> - applicable only if <code>remove</code> is <code>true</code>. indicates that every consumed message needs to be ACKed in order not to receive it again in case of
+calling <code>consume</code> again. see <code>queue.ack</code> for ack details. default is <code>false</code>.
+</em> <code>last</code> - applicable only if <code>reliable</code> is <code>true</code>. indicates the last message id that was ACKed so that only messages with higher id's should be received.
+if any messages still exist in the queue with id's lower than <code>last</code> they will be discarded.
+this behaves exactly like calling <code>queue.ack</code> with the last id before starting to consume. default is 0.</p>
+<h3 id="queueackid-callback">queue.ack(id[, callback])<a class="headerlink" href="#queueackid-callback" title="Permanent link"></a></h3>
+<p>Specifies that the message with the specified id, and all messages with lower id's, can safely be discarded so that
+they should never be consumed again. Ignored if not consuming in reliable mode.</p>
+<ul>
+<li><code>id</code> - the message id to ack</li>
+<li><code>callback</code> - invoked after the message was actually acked. receives <code>err</code>.</li>
+</ul>
+<h3 id="queueisconsumingcallback">queue.isConsuming([callback])<a class="headerlink" href="#queueisconsumingcallback" title="Permanent link"></a></h3>
+<p>Returns <code>true</code> if this client is consuming messages, <code>false</code> otherwise.</p>
+<ul>
+<li><code>callback</code> - receives <code>err</code> and the consuming state</li>
+</ul>
+<h3 id="queuestop">queue.stop()<a class="headerlink" href="#queuestop" title="Permanent link"></a></h3>
+<p>Stop consuming messages from the queue.</p>
+<h3 id="queueclose">queue.close()<a class="headerlink" href="#queueclose" title="Permanent link"></a></h3>
+<p>Closes the queue and destroys all messages. Emits the <code>closed</code> event once it is closed.</p>
+<h3 id="queueflushcallback">queue.flush([callback])<a class="headerlink" href="#queueflushcallback" title="Permanent link"></a></h3>
+<p>Empty the queue, removing all messages.</p>
+<ul>
+<li><code>callback</code> - invoked after the queue was flushed. receives <code>err</code>.</li>
+</ul>
+<h3 id="queueexistscallback">queue.exists([callback])<a class="headerlink" href="#queueexistscallback" title="Permanent link"></a></h3>
+<p>Checks if the queue exists in the local bus.</p>
+<ul>
+<li><code>callback</code> - receives <code>err</code> and <code>result</code> with a value of <code>true</code> if the queue exists, <code>false</code> otherwise</li>
+</ul>
+<h3 id="queuefindcallback">queue.find([callback])<a class="headerlink" href="#queuefindcallback" title="Permanent link"></a></h3>
+<p>Checks if the queue already exists in the local bus or a federated bus. Note that a queue can only be found
+if the federated bus has announced its existence to the federating buses. This is something that happens periodically
+during the lifecycle of the queue, where the frequency depends on the ttl of the queue.
+Normally this method would be called before calling <code>queue.attach</code>.</p>
+<ul>
+<li><code>callback</code> - receives <code>err</code> and the <code>location</code> of the queue. 
+   if the queue exists locally, <code>location</code> will be set to <code>local</code>.
+   if the queue exists in a federated bus, <code>location</code> will be set to the url of the federated bus.
+   if the queue is not found, <code>location</code> is set to <code>null</code>.</li>
+</ul>
+<h3 id="queuecountcallback">queue.count([callback])<a class="headerlink" href="#queuecountcallback" title="Permanent link"></a></h3>
+<p>Get the number if messages in the queue.</p>
+<ul>
+<li><code>callback</code> - receives <code>err</code> and the number of messages in the queue</li>
+</ul>
+<h3 id="queuettlcallback">queue.ttl([callback])<a class="headerlink" href="#queuettlcallback" title="Permanent link"></a></h3>
+<p>Get the time in seconds for the queue to live without any attachments.</p>
+<ul>
+<li><code>callback</code> - receives <code>err</code> and the ttl in seconds</li>
+</ul>
+<h3 id="queuemetadatakey-value-callback">queue.metadata(key [, value][, callback])<a class="headerlink" href="#queuemetadatakey-value-callback" title="Permanent link"></a></h3>
+<p>Get or set arbitrary metadata on the queue.
+Will set the metadata <code>key</code> to the provided <code>value</code>, or get the current value of the key if the <code>value</code> parameter is not provided.</p>
+<ul>
+<li><code>key</code> - the metadata key to set or get</li>
+<li><code>value</code> - [optional] the value to set on the key.</li>
+<li><code>callback</code> - receives <code>err</code> as the first argument. if setting a metadata value, it is called with no further arguments.
+if retrieving the value, it is called with the retrieved value.</li>
+</ul>
+<h3 id="queuepushedcallback">queue.pushed([callback])<a class="headerlink" href="#queuepushedcallback" title="Permanent link"></a></h3>
+<p>Returns the number of messages pushed by this client to the queue</p>
+<ul>
+<li><code>callback</code> - receives <code>err</code> and the number of pushed messages</li>
+</ul>
+<h3 id="queueconsumedcallback">queue.consumed([callback])<a class="headerlink" href="#queueconsumedcallback" title="Permanent link"></a></h3>
+<p>Returns the number of messages consumed by this client from the queue</p>
+<ul>
+<li><code>callback</code> - receives <code>err</code> and the number of consumed messages</li>
+</ul>
+<h3 id="queue-events">Queue Events<a class="headerlink" href="#queue-events" title="Permanent link"></a></h3>
+<ul>
+<li><code>attaching</code> - emitted when starting to attach</li>
+<li><code>attached</code> - emitted when attached to the queue. The listener callback receives <code>true</code> if the queue already exists
+and <code>false</code> if it was just created.</li>
+<li><code>detaching</code> - emitted when starting to detach</li>
+<li><code>detached</code> - emitted when detached from the queue. If no other clients are attached to the queue, the queue will remain alive for the <code>ttl</code> duration</li>
+<li><code>consuming</code> - emitted when starting or stopping to consume messages from the queue. The listener callback will receive <code>true</code>
+if starting to consume and <code>false</code> if stopping to consume.</li>
+<li><code>message</code> - emitted when a message is consumed from the queue. The listener callback receives the message as a string and the id of the message as an integer.</li>
+<li><code>error</code> - emitted when some error occurs. The listener callback receives the error.</li>
+</ul>
+<h2 id="channel">Channel<a class="headerlink" href="#channel" title="Permanent link"></a></h2>
+<p>A bi-directional channel for peer-to-peer communication. Under the hood, a channel uses two message queues,
+where each peer pushes messages to one queue and consumes messages from the other queue.
+It does not matter which peer connects to the channel first.</p>
+<p>Each peer in the channel has a role. For all purposes roles are the same, except that the roles determine to which
+queue messages will be pushed and from which queue they will be consumed. To peers to communicate over the channel, they must have opposite roles.</p>
+<p>By default, a channel uses role <code>local</code> to consume messages and <code>remote</code> to push messages.
+Since peers must have opposite roles, if using the default roles, one peer must call <code>channel.listen</code> and the other peer must call <code>channel.connect</code>.</p>
+<p>It is also possible to specify other roles explicitly, such as <code>client</code> and <code>server</code>.
+This enables specifying the local role and the remote role, and just connecting the channel without calling <code>listen</code>.
+Specifying roles explicitly may add to readability, but not much more than that.</p>
+<p>A channel supports the same consumption modes as a queue does. See <a href="#consumption-modes">Consumption Modes</a> for details.</p>
+<h3 id="using-a-channel-default-roles">Using a channel (default roles)<a class="headerlink" href="#using-a-channel-default-roles" title="Permanent link"></a></h3>
+<p>Server endpoint:</p>
+<pre><code class="javascript">bus.on('online', function() {
+  var c = bus.channel('bar'); // use default names for the endpoints
+  c.on('connect', function() {
+    // connected to the channel
+  });
+  c.on('remote:connect', function() {
+    // the client is connected to the channel
+    c.send('hello client!');
+  });
+  c.on('message', function(message) {
+    // received a message from the client
+  });
+  c.listen(); // reverse the endpoint roles and connect to the channel
+});
+</code></pre>
+
+<p>Client endpoint:</p>
+<pre><code class="javascript">bus.on('online', function() {
+  var c = bus.channel('bar'); // use default names for the endpoints
+  c.on('connect', function() {
+    // connected to the channel
+  });
+  c.on('remote:connect', function() {
+    // the server is connected to the channel
+    c.send('hello server!');
+  });
+  c.on('message', function(message) {
+    // received a message from the server
+  });
+  c.connect(); // connect to the channel
+});
+</code></pre>
+
+<h3 id="using-a-channel-explicit-roles">Using a channel (explicit roles)<a class="headerlink" href="#using-a-channel-explicit-roles" title="Permanent link"></a></h3>
+<p>Server endpoint:</p>
+<pre><code class="javascript">bus.on('online', function() {
+  // local role is server, remote role is client
+  var c = bus.channel('zoo', 'server', 'client');
+  c.on('connect', function() {
+    // connected to the channel
+  });
+  c.on('remote:connect', function() {
+    // the client is connected to the channel
+    c.send('hello client!');
+  });
+  c.on('message', function(message) {
+    // received a message from the client
+  });
+  c.connect(); // connect to the channel
+});
+</code></pre>
+
+<p>Client endpoint:</p>
+<pre><code class="javascript">bus.on('online', function() {
+  // notice the reverse order of roles
+  // local role is client, remote role is server
+  var c = bus.channel('zoo', 'client', 'server');
+  c.on('connect', function() {
+    // connected to the channel
+  });
+  c.on('remote:connect', function() {
+    // the server is connected to the channel
+    c.send('hello server!');
+  });
+  c.on('message', function(message) {
+    // received a message from the server
+  });
+  c.connect(); // connect to the channel
+});
+</code></pre>
+
+<h3 id="channelconnect">channel.connect()<a class="headerlink" href="#channelconnect" title="Permanent link"></a></h3>
+<p>Connects to the channel. The <code>connect</code> event is emitted once connected to the channel.</p>
+<h3 id="channelattach">channel.attach()<a class="headerlink" href="#channelattach" title="Permanent link"></a></h3>
+<p>Alias to <code>channel.connect()</code></p>
+<h3 id="channellisten">channel.listen()<a class="headerlink" href="#channellisten" title="Permanent link"></a></h3>
+<p>Connects to the channel with reverse semantics of the roles. 
+The <code>connect</code> event is emitted once connected to the channel.</p>
+<h3 id="channelsendmessage-callback">channel.send(message[, callback])<a class="headerlink" href="#channelsendmessage-callback" title="Permanent link"></a></h3>
+<p>Send a message to the peer. The peer does need to be connected for a message to be sent.</p>
+<ul>
+<li><code>message</code> - the message to send</li>
+<li><code>callback</code> - invoked after the message was actually pushed to the channel. receives <code>err</code> and the <code>id</code> of the pushed message</li>
+</ul>
+<h3 id="channelsendtoendpoint-message-callback">channel.sendTo(endpoint, message[, callback])<a class="headerlink" href="#channelsendtoendpoint-message-callback" title="Permanent link"></a></h3>
+<p>Send a message to the the specified endpoint. There is no need to connect to the channel with <code>channel.connect</code> or <code>channel.listen</code>.</p>
+<ul>
+<li><code>endpoint</code> - the target endpoint to receive the message</li>
+<li><code>message</code> - the message to send</li>
+<li><code>callback</code> - invoked after the message was actually pushed to the channel. receives <code>err</code> and the <code>id</code> of the pushed message</li>
+</ul>
+<h3 id="channeldisconnect">channel.disconnect()<a class="headerlink" href="#channeldisconnect" title="Permanent link"></a></h3>
+<p>Disconnect from the channel. The channel remains open and a different peer can connect to it.</p>
+<h3 id="channeldetach">channel.detach()<a class="headerlink" href="#channeldetach" title="Permanent link"></a></h3>
+<p>Alias to <code>channel.disconnect()</code></p>
+<h3 id="channelend">channel.end()<a class="headerlink" href="#channelend" title="Permanent link"></a></h3>
+<p>End the channel. No more messages can be pushed or consumed. This also caused the peer to disconnect from the channel and close the message queues.</p>
+<h3 id="channelackid-callback">channel.ack(id[, callback])<a class="headerlink" href="#channelackid-callback" title="Permanent link"></a></h3>
+<p>See <a href="#queueackid">queue.ack</a> for details</p>
+<h3 id="channelisattachedcallback">channel.isAttached([callback])<a class="headerlink" href="#channelisattachedcallback" title="Permanent link"></a></h3>
+<p>Returns <code>true</code> if connected to the channel, <code>false</code> if not connected.</p>
+<h3 id="channel-events">Channel Events<a class="headerlink" href="#channel-events" title="Permanent link"></a></h3>
+<ul>
+<li><code>connect</code> - emitted when connected to the channel</li>
+<li><code>remote:connect</code> - emitted when a remote peer connects to the channel</li>
+<li><code>disconnect</code> - emitted when disconnected from the channel</li>
+<li><code>remote:disconnect</code> - emitted when the remote peer disconnects from the channel</li>
+<li><code>message</code> - emitted when a message is received from the channel. The listener callback receives the message as a string.</li>
+<li><code>end</code> - emitted when the remote peer ends the channel</li>
+<li><code>error</code> - emitted when an error occurs. The listener callback receives the error.</li>
+</ul>
+<h2 id="persistable">Persistable<a class="headerlink" href="#persistable" title="Permanent link"></a></h2>
+<p>It is possible to persist arbitrary objects to the bus.
+A persistable object defines a set of properties on the object that are tracked for modification. When
+saving a dirty object (where dirty means that some tracked properties have changed) only those dirty properties are
+persisted to the bus. Loading a persistable object reads all of the persisted properties.</p>
+<pre><code>bus.on('online', function() {
+  var object = {field: 'this field is not persisted'};
+  var p = bus.persistify('obj', object, ['foo', 'bar', 'zoo']);
+  p.foo = 'hello';
+  p.bar = 1;
+  p.zoo = true;
+  p.save(function(err) {
+    // foo, bar and zoo fields have been saved
+  });
+
+  p.foo = 'world';
+  p.save(function(err) {
+    // only foo has been saved
+  });
+
+  // load the persistified properties
+  var p2 = bus.persistify('obj', {}, ['foo', 'bar', 'zoo']);
+  p2.load(function(err, exists) {
+    // exists == true
+    // p2.foo == 'world'
+    // p2.bar == 2
+    // p2.zpp == true'
+  });
+});
+</code></pre>
+
+<h3 id="persistablesavecallback">persistable.save([callback])<a class="headerlink" href="#persistablesavecallback" title="Permanent link"></a></h3>
+<p>Save all the dirty properties. The dirty properties are marked as not dirty after the save completes.</p>
+<ul>
+<li><code>callback</code> - called when the save has finished. receives <code>err</code> if there was an error.</li>
+</ul>
+<h3 id="persistableloadcallback">persistable.load([callback])<a class="headerlink" href="#persistableloadcallback" title="Permanent link"></a></h3>
+<p>Load all the tracked properties. All properties are marked as not dirty after the load completes.</p>
+<ul>
+<li><code>callback</code>  - called when the load has finished. receives <code>err</code>, <code>exists</code> and <code>id</code>
+where <code>exists</code> is true if the persisted object was found in the bus and <code>id</code> is the id of the object whose data was searched.</li>
+</ul>
+<h3 id="persistablepersistttl">persistable.persist(ttl)<a class="headerlink" href="#persistablepersistttl" title="Permanent link"></a></h3>
+<p>Start a periodic timer to continuously mark the persisted object as being used.</p>
+<ul>
+<li><code>ttl</code> specifies the number of seconds to keep the object alive in the bus.</li>
+</ul>
+<h3 id="persistableunpersist">persistable.unpersist()<a class="headerlink" href="#persistableunpersist" title="Permanent link"></a></h3>
+<p>Stop the periodic timer. This will cause object to expire after the defined ttl provided in the persist method.</p>
+<h2 id="publishsubscribe">Publish/Subscribe<a class="headerlink" href="#publishsubscribe" title="Permanent link"></a></h2>
+<p>A plain old publish/subscribe channel. These channels are not backed by queues, so any subscriber not subscribed at the
+time a message is published will not receive the message.</p>
+<p>Publish/Subscribe channel are always created on the first redis server in the list of redis servers
+the bus is connected to. The reason for this is the time it would take to locate a publish/subscribe channel via the
+redis api were the channels distributed between all redis servers (it's O(N) where N is the number of subscribers).</p>
+<pre><code>bus.on('online', function() {
+  var s = bus.pubsub('my pubsub channel');
+  s.on('message', function(message) {
+    // received message 'hello world' on subscribed channel
+  });
+  s.subscribe();
+
+  var p = bus.pubsub('my pubsub channel');
+  p.publish('hello world');
+});
+</code></pre>
+
+<h3 id="pubsubpublishmessage-callback">pubsub.publish(message[, callback])<a class="headerlink" href="#pubsubpublishmessage-callback" title="Permanent link"></a></h3>
+<p>Publishes a message on the pubsub channel. Only currently subscribed clients will receive the message.</p>
+<ul>
+<li><code>message</code> - the message to publish</li>
+<li><code>callback</code> - invoked after the message was actually published. receives <code>err</code> if there was an error. <em>note: starting
+from version 1.5.0, the callback no longer receives the number of subscribers that received the message.</em></li>
+</ul>
+<h3 id="pubsubsubscribe">pubsub.subscribe()<a class="headerlink" href="#pubsubsubscribe" title="Permanent link"></a></h3>
+<p>Subscribes to message in the pubsub channel. Once a message is received, the <code>message</code> event will be emitted.</p>
+<h3 id="pubsubunsubscribe">pubsub.unsubscribe()<a class="headerlink" href="#pubsubunsubscribe" title="Permanent link"></a></h3>
+<p>Unsubscribes from messages on the pubsub channel. Messages can still be published using the <code>publish</code> method.</p>
+<h3 id="pubsubissubscribed">pubsub.isSubscribed()<a class="headerlink" href="#pubsubissubscribed" title="Permanent link"></a></h3>
+<p>Returns <code>true</code> if subscribed to messages from the pubsub channel, <code>false</code> if not.</p>
+<h3 id="pubsub-events">Pubsub Events<a class="headerlink" href="#pubsub-events" title="Permanent link"></a></h3>
+<ul>
+<li><code>subscribed</code> - emitted when subscribed to messages on the pubsub channel</li>
+<li><code>unsubscribed</code> - emitted when unsubscribing from the pubsub channel</li>
+<li><code>message</code> - emitted when a message is received from the pubsub channel. The listener callback receives the message as a string.</li>
+<li><code>error</code> - emitted when an error occurs. The listener callback receives the error.</li>
+</ul>
+<h2 id="federation">Federation<a class="headerlink" href="#federation" title="Permanent link"></a></h2>
+<p>It is sometimes desirable to setup bus instances in different locations, where redis
+servers of one location are not directly accessible to other locations. This setup is very common
+when building a bus that spans several data centers, where each data center is isolated behind a firewall.</p>
+<p>Federation enables using queues, channels and persisted objects of a bus without access to the redis servers themselves.
+When federating an object, the federating bus uses web sockets to the target bus as the federation channel,
+and the federated bus manages the object on its redis servers on behalf of the federating bus.
+The federating bus does not host the federated objects on the local redis servers.</p>
+<p>Federation is done over web sockets since they are firewall and proxy friendly.</p>
+<p>The federating bus utilizes a simple pool of always-connected web sockets. When a bus is initialized, it
+spins up an fixed number of web sockets that connect to federated bus instances. When federating an object, the bus
+selects a web socket from the pool and starts federating the object over it.</p>
+<p>The API and events of a federated objects are exactly the same as a non-federated objects. This is achieved
+using the <a href="https://github.com/substack/dnode">dnode</a> module for RPCing the object API.</p>
+<h4 id="opening-a-bus-with-a-federation-server">Opening a bus with a federation server<a class="headerlink" href="#opening-a-bus-with-a-federation-server" title="Permanent link"></a></h4>
+<pre><code class="javascript">// this server is running on 192.168.0.1
+var http = require('http');
+var httpServer = http.createServer(); // create the http server to serve as the federation server. you can also use express if you like...
+httpServer.listen(8881);
+var Bus = require('busmq');
+var options = {
+  redis: 'redis://127.0.0.1', // connect this bus to a local running redis
+  federate: { // also open a federation server
+    server: httpServer,  // use the provided http server as the federation server
+    secret: 'mysecret',   // a secret key for authorizing clients
+    path: '/my/fed/path' // the federation service is accessible on this path in the server
+  }
+};
+var bus = Bus.create(options);
+bus.on('online', function() {
+  // the bus is now ready to receive federation requests
+});
+bus.connect();
+</code></pre>
+
+<h4 id="federating-a-queue">Federating a queue<a class="headerlink" href="#federating-a-queue" title="Permanent link"></a></h4>
+<pre><code class="javascript">var Bus = require('busmq');
+var options = {
+  federate: { // connect to a federate bus
+    poolSize: 5, // keep the pool size with 5 web sockets
+    urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url
+    secret: 'mysecret'  // the secret key to authorize with the federation server
+  }
+};
+var bus = Bus.create(options);
+bus.on('online', function() {
+ // federate the queue to a bus located at a different data center
+ var fed = bus.federate(bus.queue('foo'), 'http://192.168.0.1:8881/my/fed/path');
+ fed.on('ready', function(q) {
+   // federation is ready - we can start using the queue
+   q.on('attached', function() {
+     // do whatever
+   });
+   q.attach();
+ });
+});
+bus.connect();
+</code></pre>
+
+<h4 id="finding-a-queue">Finding a queue<a class="headerlink" href="#finding-a-queue" title="Permanent link"></a></h4>
+<p>It is possible to find a queue that exists in a federated bus. 
+Note that a queue can only be found if the federated bus has announced its existence to the federating buses. 
+This is something that happens periodically during the lifecycle of the queue, where the announcement frequency<br />
+depends on the ttl of the queue (frequency is ttl/3)</p>
+<h5 id="making-a-queue-discoverable">Making a queue discoverable<a class="headerlink" href="#making-a-queue-discoverable" title="Permanent link"></a></h5>
+<pre><code class="javascript"> // a queue named 'foo' is created in the federated bus at http://192.168.0.1:8881 and is made discoverable
+ var queue = bus.queue('foo');
+ queue.attach({discoverable: true});
+</code></pre>
+
+<h5 id="finding-the-discoverable-queue">Finding the discoverable queue<a class="headerlink" href="#finding-the-discoverable-queue" title="Permanent link"></a></h5>
+<pre><code class="javascript">  // find the queue named 'foo'
+  var queue = bus.queue('foo');
+  queue.find(function(err, location) {
+    console.log(location === 'http://192.168.0.1:8881/my/fed/path'); // will print 'true'
+    // we can now federate the queue
+    var fed = bus.federate(queue, location);
+  });
+</code></pre>
+
+<h4 id="federating-a-channel">Federating a channel<a class="headerlink" href="#federating-a-channel" title="Permanent link"></a></h4>
+<pre><code class="javascript">var Bus = require('busmq');
+var options = {
+  federate: { // connect to a federate bus
+    poolSize: 5, // keep the pool size with 5 web sockets
+    urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url
+    secret: 'mysecret'  // the secret key to authorize with the federation server
+  }
+};
+var bus = Bus.create(options);
+bus.on('online', function() {
+ // federate the channel to a bus located at a different data center
+ var fed = bus.federate(bus.channel('bar'), 'http://192.168.0.1:8881/my/fed/path');
+ fed.on('ready', function(c) {
+   // federation is ready - we can start using the channel
+   c.on('message', function(message) {
+     // do whatever
+   });
+   c.attach();
+ });
+});
+bus.connect();
+</code></pre>
+
+<h4 id="federating-a-persistable-object">Federating a persistable object<a class="headerlink" href="#federating-a-persistable-object" title="Permanent link"></a></h4>
+<pre><code class="javascript">var Bus = require('busmq');
+var options = {
+  federate: { // connect to a federate bus
+    poolSize: 5, // keep the pool size with 5 web sockets
+    urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url
+    secret: 'mysecret'  // the secret key to authorize with the federation server
+  }
+};
+var bus = Bus.create(options);
+bus.on('online', function() {
+ // federate the persistent object to a bus located at a different data center
+ var fed = bus.federate(bus.persistify('bar', object, ['field1', 'field2']), 'http://192.168.0.1:8881/my/fed/path');
+ fed.on('ready', function(p) {
+   // federation is ready - we can start using the persisted object
+   p.load(function(err, exists) {
+     // do whatever
+   });
+ });
+});
+bus.connect();
+</code></pre>
+
+<h4 id="federating-a-pubsub">Federating a pubsub<a class="headerlink" href="#federating-a-pubsub" title="Permanent link"></a></h4>
+<pre><code class="javascript">var Bus = require('busmq');
+var options = {
+  federate: { // also connect to a federate bus
+    poolSize: 5, // keep the pool size with 5 web sockets
+    urls: ['http://192.168.0.1:8881/my/fed/path'],  // pre-connect to these urls, 5 web sockets to each url
+    secret: 'mysecret'  // the secret ket to authorize with the federation server
+  }
+};
+var bus = Bus.create(options);
+bus.on('online', function() {
+ // federate the channel to a bus located at a different data center
+ var fed = bus.federate(bus.pubsub('bar'), 'http://192.168.0.1:8881/my/fed/path');
+ fed.on('ready', function(p) {
+   // federation is ready - we can start using pubsub
+   p.on('message', function(message) {
+     // do whatever
+   });
+   p.subscribe();
+   p.publish('foo bar');
+ });
+});
+bus.connect();
+</code></pre>
+
+<h3 id="federateclosedisconnect">federate.close(disconnect)<a class="headerlink" href="#federateclosedisconnect" title="Permanent link"></a></h3>
+<p>Close the federation object.</p>
+<ul>
+<li><code>disconnect</code> - true to disconnect the underlying websocket</li>
+</ul>
+<h4 id="federate-events">Federate Events<a class="headerlink" href="#federate-events" title="Permanent link"></a></h4>
+<ul>
+<li><code>ready</code> - emitted when the federation setup is ready. The callback receives the bus object to use.</li>
+<li><code>unauthorized</code> - incorrect secret key was used to authenticate with the federation server</li>
+<li><code>reconnecting</code> - the federation connection was disconnected and is now reconnecting</li>
+<li><code>reconnected</code> - the federation connection has successfully reconnected</li>
+<li><code>close</code> - the federation connection closed permanently</li>
+<li><code>error</code> - some error occurred. the callback receives the <code>error</code> message</li>
+</ul>
+<h2 id="browser-support">Browser Support<a class="headerlink" href="#browser-support" title="Permanent link"></a></h2>
+<p>Browser support is achieved through the use of federation to the bus server over native browser websockets. 
+The following API is only available from a browser connecting to a federation server.
+It enables the use of queues, channels and persisted objects.</p>
+<h3 id="how-to-build">How to Build<a class="headerlink" href="#how-to-build" title="Permanent link"></a></h3>
+<p>Generating the latest <code>busmq.js</code> and <code>busmq.min.js</code> files requires cloning the git repo.</p>
+<pre><code class="bash">git clone https://github.com/capriza/node-busmq.git
+cd node-busmq
+npm install
+npm run browser
+</code></pre>
+
+<h4 id="usage_1">Usage<a class="headerlink" href="#usage_1" title="Permanent link"></a></h4>
+<pre><code class="javascript">&lt;script src=&quot;busmq.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;script&gt;
+  // connect to the bus running a federation server on port 8080 and with secret 'notsosecret'
+  var bus = busmq('ws://localhost:8080/', 'notsosecret');
+
+  // create a queue object named 'foo'.
+  // the queue will be created in the bus and the callback will be invoked when the queue is ready
+  bus.queue('foo', function(err, q) {
+    if (err) {
+      console.log('bus: error ' + err);
+      return;
+    }
+    console.log('bus: q ready');
+    q.on('attached', function() {
+      console.log('bus: queue attached');
+      // push 5 messages to the queue
+      for (var i = 0; i &lt; 5; ++i) {
+        q.push('message number ' + i);
+      }
+    });
+    q.on('message', function(message, id) {
+      // 5 messages should be received
+      console.log('got bus message ' + id + ': ' + message);
+    });
+    // attach to the queue and consume messages from it
+    q.attach();
+    q.consume();
+  });
+&lt;/script&gt;
+</code></pre>
+
+<h3 id="busmqurl-secret">busmq(url, secret)<a class="headerlink" href="#busmqurl-secret" title="Permanent link"></a></h3>
+<p>Connect to the federation server a of running bus.
+Returns a <code>Bus</code> object.</p>
+<ul>
+<li><code>url</code> - the url of the bus federation server. the protocol must be <code>ws</code> or <code>wss</code>.</li>
+<li><code>secret</code> - the federation server secret</li>
+</ul>
+<h3 id="busqueuename-cb">bus.queue(name, cb)<a class="headerlink" href="#busqueuename-cb" title="Permanent link"></a></h3>
+<p>Create a federated <code>queue</code> object.</p>
+<ul>
+<li><code>name</code> - queue name</li>
+<li><code>cb</code> - callback invoked when the federated object is ready. the callback format is <code>function(err, queue)</code>.</li>
+</ul>
+<h3 id="buschannelname-local-remote-cb">bus.channel(name, local, remote, cb)<a class="headerlink" href="#buschannelname-local-remote-cb" title="Permanent link"></a></h3>
+<p>Create a federated <code>channel</code> object.</p>
+<ul>
+<li><code>name</code> - channel name</li>
+<li><code>local</code> - local role</li>
+<li><code>remote</code> - remote role</li>
+<li><code>cb</code> - callback invoked when the federated object is ready. the callback format is <code>function(err, channel)</code>.</li>
+</ul>
+<h3 id="buspubsubname-cb">bus.pubsub(name, cb)<a class="headerlink" href="#buspubsubname-cb" title="Permanent link"></a></h3>
+<p>Create a federated <code>pubsub</code> object.</p>
+<ul>
+<li><code>name</code> - queue name</li>
+<li><code>cb</code> - callback invoked when the federated object is ready. the callback format is <code>function(err, pubsub)</code>.</li>
+</ul>
+<h3 id="buspersistifyname-object-attributes-cb">bus.persistify(name, object, attributes, cb)<a class="headerlink" href="#buspersistifyname-object-attributes-cb" title="Permanent link"></a></h3>
+<p>Create a federated <code>persistable</code> object.</p>
+<ul>
+<li><code>name</code> - channel name</li>
+<li><code>object</code> - the object to persistify</li>
+<li><code>attributes</code> - object attributes to persist</li>
+<li><code>cb</code> - callback invoked when the federated object is ready. the callback format is <code>function(err, persisted)</code>.</li>
+</ul></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2017 <a href="https://www.capriza.com">Capriza, Inc.</a></p>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+        <script src="../js/base.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        
+        
+        <link rel="shortcut icon" href="./img/favicon.ico">
+        <title>BusMQ</title>
+        <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="./css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="./css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="./css/highlight.css">
+        <link href="./css/extra.css" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+	
+	<script src="./js/jquery-1.10.2.min.js"></script>
+        <script src="./js/bootstrap-3.0.3.min.js"></script>
+        <script src="./js/highlight.pack.js"></script> 
+    </head>
+
+    <body class="homepage">
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href=".">BusMQ</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li class="active">
+                        <a href=".">Home</a>
+                    </li>
+                    <li >
+                        <a href="usage/">Usage</a>
+                    </li>
+                    <li >
+                        <a href="performance/">Performance</a>
+                    </li>
+                    <li >
+                        <a href="license/">License</a>
+                    </li>
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li class="disabled">
+                        <a rel="next" >
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="usage/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/capriza/node-busmq">
+                                <i class="fa fa-github"></i>GitHub
+                        </a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#busmq">BusMQ</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#motivation">Motivation</a></li>
+            <li><a href="#high-availability-and-scaling">High Availability and Scaling</a></li>
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#usage">Usage</a></li>
+            <li><a href="#browser-support">Browser Support</a></li>
+            <li><a href="#tests">Tests</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h1 id="busmq"><img alt="logo" src="./img/busmq-logo-78.png" /> BusMQ<a class="headerlink" href="#busmq" title="Permanent link"></a></h1>
+<p>BusMQ is a production grade message bus for node.js backed by <a href="http://redis.io/">Redis</a> queues.</p>
+<hr />
+<h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link"></a></h2>
+<ul>
+<li>Event based message queues</li>
+<li>Event based bi-directional channels for peer-to-peer communication (backed by message queues)</li>
+<li>Reliable delivery of messages (AKA Guaranteed Delivery)</li>
+<li>Publish/Subscribe channels</li>
+<li>Persistent Publish/Subscribe (backed by message queues)</li>
+<li>Federation over distributed data centers</li>
+<li>Discoverable queues over federation</li>
+<li>Auto expiration of queues after a pre-defined idle time</li>
+<li>Scalability through the use of multiple redis instances and node processes</li>
+<li>High availability through redis master-slave setup and stateless node processes</li>
+<li>Tolerance to dynamic addition of redis instances</li>
+<li>Choice of connection driver - <a href="https://github.com/NodeRedis/node_redis">node_redis</a> or <a href="https://github.com/luin/ioredis">ioredis</a> (thanks to <a href="https://github.com/bgrieder">bgrieder</a>)</li>
+<li>Out-of-the-box support for Redis Sentinels and Clusters when using ioredis driver (thanks to <a href="https://github.com/bgrieder">bgrieder</a>)</li>
+<li>Connect to the bus from a browser (via federation)</li>
+</ul>
+<h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link"></a></h2>
+<p>There are several exiting node modules that provide great queues-backed-by-redis functionality,
+such as <a href="https://github.com/learnboost/kue">Kue</a>, <a href="https://github.com/OptimalBits/bull">Bull</a> and
+<a href="https://github.com/gosquared/convoy">Convoy</a>, so what's so special about busmq?</p>
+<p>Although seemingly the other modules provide similar features, they lack a very specific feature that's required
+for a reliable message queue: guaranteed order. <em>Jobs</em> is the main focus for these modules, whereas busmq focuses on
+<em>messages</em>.</p>
+<p>Inherently, job processing does not require a certain order - if a job fails it can simply be retried
+at a later time with (usually) no ill-effects. However, message processing is very order dependant - if you receive a message
+out of order then there's no telling what the consequences may be. A good example is
+<a href="http://en.wikipedia.org/wiki/Out-of-order_delivery">TCP message order importance</a> - clients are guaranteed
+that TCP packets are <em>always</em> received in the correct order. That's what busmq focuses on, which makes busmq much
+more like <a href="http://www.rabbitmq.com/">RabbitMQ</a> rather than a generic queueing system.</p>
+<p>Of course, the other modules may double as messages queues, but that's just not their main focus. In addition, busmq
+provides built-in features for peer-to-peer communication, scaling, high-availability and federation which are extremely important for a reliable
+messaging system.</p>
+<h2 id="high-availability-and-scaling">High Availability and Scaling<a class="headerlink" href="#high-availability-and-scaling" title="Permanent link"></a></h2>
+<p>Scaling is achieved by spreading queues and channels between multiple redis instances.
+The redis instance is selected by performing a calculation on the queue/channel name.
+If the redis instances are added and the designated redis instance of a queue changes because of it then
+the bus will still find the correct redis instance. There will be some time penalty until the system
+stabilizes after the addition.</p>
+<p>High availability for redis is achieved by using standard redis high availability setups, such as
+<a href="http://redis.io/topics/cluster-tutorial">Redis Cluster</a>, <a href="http://redis.io/topics/sentinel">Redis Sentinal</a> or <a href="http://aws.amazon.com/elasticache/">AWS ElasticCache</a></p>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link"></a></h2>
+<pre><code class="no-highlight">npm install --save busmq
+</code></pre>
+
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link"></a></h2>
+<p>See <a href="usage/">Usage</a></p>
+<h2 id="browser-support">Browser Support<a class="headerlink" href="#browser-support" title="Permanent link"></a></h2>
+<p>See <a href="usage/#browser-support">Usage#Browser Support</a></p>
+<h2 id="tests">Tests<a class="headerlink" href="#tests" title="Permanent link"></a></h2>
+<p>Redis server must be installed to run the tests, but does not need to be running.
+Download redis from <a href="https://redis.io">https://redis.io</a>.</p>
+<pre><code class="no-highlight">./node_modules/mocha/bin/mocha test
+</code></pre></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2017 <a href="https://www.capriza.com">Capriza, Inc.</a></p>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '.';</script>
+        <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
+        <script src="./js/base.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
+
+<!--
+MkDocs version : 0.16.1
+Build Date UTC : 2017-02-21 21:11:50
+-->
