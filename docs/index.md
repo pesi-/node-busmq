@@ -1,5 +1,4 @@
-# <img src="https://capriza.github.io/images/logos/logos-busmq.svg" height="78" align="center" />
- BusMQ
+# <img src="https://capriza.github.io/images/logos/logos-busmq.svg" height="78" align="center" /> BusMQ
 
 BusMQ is a production grade message bus for node.js backed by [Redis](http://redis.io/) queues.
 
