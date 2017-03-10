@@ -1,4 +1,4 @@
-<div align="center"><img src="https://capriza.github.io/images/logos/logos-busmq.svg" height="96" /></div>
+<div align="center"><img src="https://capriza.github.io/images/logos/logos-busmq.svg" height="128" /></div>
 
 BusMQ
 ===
