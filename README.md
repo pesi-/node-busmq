@@ -1,4 +1,4 @@
-<img src="https://capriza.github.io/images/logos/logos-busmq.svg" style="height:128px; background: no-repeat center/128px url("https://capriza.github.io/images/logos/logos-background.svg");"/>
+<img src="https://capriza.github.io/images/logos/logos-busmq.svg" height="96" align="center" />
 
 # BusMQ
 
