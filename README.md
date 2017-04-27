@@ -4,7 +4,7 @@ BusMQ
 ===
 
 BusMQ is a production grade message bus for node.js backed by [Redis](http://redis.io/) queues. 
-It's used in a globally deployed production environment, powering the Capriza message relaying service. 
+It's used in a globally deployed production environment, powering the [Capriza](https://www.capriza.com) message relaying service. 
 
 ## Documentation 
 
