@@ -204,6 +204,11 @@ describe('BusMQ direct connectivity using node-redis', function() {
       var bus = Bus.create({redis: redisUrls, logger: console});
       tf.pubSubSubscribeUnsubscribe(bus,done);
     });
+
+    it('subscriber should receive message events after going offline and online again', function(done) {
+      var bus = Bus.create({redis: redisUrls, logger: console});
+      tf.pubSubSubscriberGetsMessagesAfterOfflineOnline(bus, redisGroup, done);
+    });
   });
 
   describe('federation', function() {

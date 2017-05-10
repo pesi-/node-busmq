@@ -91,7 +91,7 @@ RedisCluster.prototype.start = function(done) {
     startInstance(_this.port, index, function ( err, redis ) {
       if ( err ) {
         _this.stop();
-        done( err );
+        done && done( err );
         return;
       }
       _this.redises[(_this.port + index)] = redis;

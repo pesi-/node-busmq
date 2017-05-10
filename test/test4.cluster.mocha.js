@@ -207,6 +207,11 @@ describe('BusMQ Cluster', function() {
       var bus = Bus.create({driver: 'ioredis', layout: 'cluster', redis: redisUrls, logger: console});
       tf.pubSubSubscribeUnsubscribe(bus,done);
     });
+
+    // it('subscriber should receive message events after going offline and online again', function(done) {
+    //   var bus = Bus.create({driver: 'ioredis', layout: 'cluster', redis: redisUrls, logger: console});
+    //   tf.pubSubSubscriberGetsMessagesAfterOfflineOnline(bus, redisCluster, done);
+    // });
   });
 
   describe('federation', function() {

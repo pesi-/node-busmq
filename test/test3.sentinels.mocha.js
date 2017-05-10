@@ -209,6 +209,11 @@ describe('BusMQ sentinels', function() {
       var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: redisUrls, logger: console});
       tf.pubSubSubscribeUnsubscribe(bus,done);
     });
+
+    it('subscriber should receive message events after going offline and online again', function(done) {
+      var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: redisUrls, logger: console});
+      tf.pubSubSubscriberGetsMessagesAfterOfflineOnline(bus, redisSentinels, done);
+    });
   });
 
   describe('federation', function() {

@@ -58,7 +58,7 @@ RedisGroup.prototype.stop = function(done) {
     stopRedis.call(_this, port, function() {
       /* ignore errors */
       if (++stopped === _this.ports.length) {
-        done()
+        done && done()
       }
     })
   })

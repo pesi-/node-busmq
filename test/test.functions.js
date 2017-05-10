@@ -1306,6 +1306,95 @@ module.exports.pubSubSubscribeUnsubscribe = function(bus,done) {
   bus.connect();  
 }
 
+module.exports.pubSubSubscriberGetsMessagesAfterOfflineOnline = function(bus, redisLayout, done) {
+
+  var first = true;
+  var offlines = 0;
+  var qName = 'test' + Math.random();
+  var p = bus.pubsub(qName);
+  p.on('error', done);
+
+  var s1 = bus.pubsub(qName);
+  s1.on('error', done);
+
+  var s2 = bus.pubsub(qName);
+  s2.on('error', done);
+
+  bus.on('error', done);
+  bus.on('online', function() {
+
+
+    if (first) {
+      first = false;
+
+      var count = {
+        hello: 0,
+        world: 0
+      };
+
+      function _count(message) {
+        ++count[message];
+        if (count.hello === 2 && count.world === 2) {
+          // stop redises
+          redisLayout.stop(function() {
+          });
+          return;
+        }
+
+        if (count.hello === 4 && count.world === 4) {
+          // make sure there are no extra "unexpected" messages events
+          setTimeout(function() {
+            count.hello.should.be.exactly(4);
+            count.world.should.be.exactly(4);
+            s1.unsubscribe();
+            s2.unsubscribe();
+          }, 500);
+
+
+        }
+      }
+
+      s1.on('message', function(message) {
+        _count(message);
+      });
+      s1.subscribe();
+
+      s2.on('message', function(message) {
+        _count(message);
+      });
+      s2.on('unsubscribed', function() {
+        bus.disconnect();
+      });
+      s2.on('subscribed', function() {
+        p.publish('hello', function(err) {
+          Should(err).be.exactly(undefined);
+        });
+        p.publish('world', function(err) {
+          Should(err).be.exactly(undefined);
+        });
+      });
+      s2.subscribe();
+    } else {
+      p.publish('hello', function(err) {
+        Should(err).be.exactly(undefined);
+      });
+      p.publish('world', function(err) {
+        Should(err).be.exactly(undefined);
+      });
+    }
+
+  });
+  bus.on('offline', function() {
+    if (++offlines === 1) {
+      redisLayout.start();
+    } else {
+      done();
+    }
+  });
+
+  bus.connect();
+}
+
 //////////////////////////////////////////////
 //
 //  Federation
