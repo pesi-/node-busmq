@@ -54,6 +54,7 @@ Create a new bus instance.
              The default is `direct`.
 * `redis` -  specifies the redis servers to connect to. Can be a string or an array of string urls.
              A valid url has the form `redis://[auth_pass@]<host_or_ip>[:port]`.
+* `redisOptions` - options to pass to the redis client on instantiation (defaults to {}). Driver specific.
 * `federate` - an object defining federation options:
   * `server` -  an http/https server object to listen for incoming federation connections. if undefined then federation server will not be open
   * `path` - the path within the server to accept federation requests on
