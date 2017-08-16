@@ -1,6 +1,6 @@
 {
   "name": "busmq",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "A high performance, highly-available and scalable, message bus and queueing system for node.js backed by Redis",
   "author": "Capriza Inc. <backend@capriza.com>",
   "maintainers": [
@@ -34,7 +34,7 @@
   },
   "optionalDependencies": {
     "ws": "1.1.0",
-    "websocket-stream": "2.0.2",
+    "websocket-stream": "3.3.3",
     "dnode": "1.2.2"
   },
   "devDependencies": {
