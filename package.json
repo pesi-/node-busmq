@@ -33,7 +33,7 @@
     "redis": "0.12.1"
   },
   "optionalDependencies": {
-    "ws": "1.1.0",
+    "ws": "1.1.5",
     "websocket-stream": "3.3.3",
     "dnode": "1.2.2"
   },
