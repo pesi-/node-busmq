@@ -211,6 +211,25 @@ describe('BusMQ direct connectivity using node-redis', function() {
     });
   });
 
+  describe('service', function() {
+
+    it('should receive a request and return a reply', function(done) {
+      var bus = Bus.create({redis: redisUrls, logger: console});
+      tf.serviceServesRequesterPushes(bus,done);
+    });
+
+    it('should handle a request without returning a reply', function(done) {
+      var bus = Bus.create({redis: redisUrls, logger: console});
+      tf.serviceServesRequesterPushesNoReply(bus,done);
+    });
+
+    it('should garcefully shutdown', function(done) {
+      var bus = Bus.create({redis: redisUrls, logger: console});
+      tf.serviceGracefulShutdown(bus,done);
+    });
+
+  });
+
   describe('federation', function() {
 
     var fedserver;

@@ -2193,3 +2193,131 @@ module.exports.fedFindsDiscoverableQueue = function(bus, done, fedBusCreator) {
   });
   bus.connect();
 }
+
+module.exports.serviceServesRequesterPushes = function(bus, done) {
+  var testRequest = {hello: 'world'};
+  var testReply = {hi: 'there'};
+
+  bus.on('error', done);
+  bus.on('online', function() {
+    var sName = 'test'+Math.random();
+    var s = bus.service(sName);
+    var r = bus.service(sName);
+    
+    s.on('error', done);
+    s.on('request', function(request, reply) {
+      Should(request).not.be.null;
+      Should(typeof reply).be.exactly('function');
+      Should(reply.replyTo).not.be.null;
+      request.hello.should.be.exactly(testRequest.hello);
+      reply(null, testReply);
+    });
+    s.on('disconnect', function() {
+      bus.disconnect();
+    });
+    s.on('serving', function() {
+      r.on('error', done);
+      r.on('disconnect', function() {
+        s.disconnect();
+      });
+      r.connect(function() {
+        r.request(testRequest, function(err, reply) {
+          Should(err).be.exactly(null);
+          Should(reply).not.be.null;
+          reply.hi.should.be.exactly(testReply.hi);
+          r.disconnect();
+        });
+      });
+    });
+    s.serve();
+  });
+  bus.on('offline', done);
+  bus.connect();
+}
+
+module.exports.serviceServesRequesterPushesNoReply = function(bus, done) {
+  var testRequest = {hello: 'world'};
+
+  bus.on('error', done);
+  bus.on('online', function() {
+    var sName = 'test'+Math.random();
+    var s = bus.service(sName);
+    var r = bus.service(sName);
+    s.on('error', done);
+    s.on('request', function(request, reply) {
+      Should(request).not.be.null;
+      Should(typeof reply).be.exactly('function');
+      Should(reply.replyTo).be.undefined;
+      request.hello.should.be.exactly(testRequest.hello);
+      reply(null);
+      r.disconnect();
+    });
+    s.on('disconnect', function() {
+      bus.disconnect();
+    });
+    s.on('serving', function() {
+      r.on('error', done);
+      r.on('disconnect', function() {
+        s.disconnect();
+      });
+      r.connect(function() {
+        r.request(testRequest);
+      });
+    });
+    s.serve();
+  });
+  bus.on('offline', done);
+  bus.connect();
+}
+
+module.exports.serviceGracefulShutdown = function(bus, done) {
+  var testRequest = {hello: 'world'};
+  var testReply = {hi: 'there'};
+  var max = 50;
+  var requests = 0;
+  var replies = 0;
+
+  bus.on('error', done);
+  bus.on('online', function() {
+    var sName = 'test'+Math.random();
+    var s = bus.service(sName);
+    var r = bus.service(sName);    
+    s.on('error', done);
+    s.on('request', function(request, reply) {
+      Should(request).not.be.null;
+      Should(typeof reply).be.exactly('function');
+      Should(reply.replyTo).not.be.null;
+      request.hello.should.be.exactly(testRequest.hello);
+      setTimeout(function() {
+        reply(null, testReply);
+      }, 10);
+      if (max === ++requests) {
+        // disconnect with a grace period
+        r.disconnect(1000);
+        s.disconnect(1000);
+      }
+    });
+    s.on('serving', function() {
+      r.on('error', done);
+      r.on('disconnect', function() {
+        bus.disconnect();
+      });
+      r.connect(function() {
+        for (var i = 0; i < max; ++i) {
+          r.request(testRequest, function(err, reply) {
+            Should(err).be.null;
+            Should(reply).not.be.null;
+            replies++;
+          });
+        }
+      });
+    });
+    s.serve();
+  });
+  bus.on('offline', function() {
+    // make sure that all replies have been received
+    replies.should.be.exactly(requests);
+    done();
+  });
+  bus.connect();
+}
