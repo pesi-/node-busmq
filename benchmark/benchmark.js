@@ -2,6 +2,7 @@ var crypto = require('crypto');
 var cluster = require('cluster');
 
 //var config = require('./config').rabbitmq;
+//var config = require('./config').sqs;
 var config = require('./config').redis;
 
 var logger = console;
