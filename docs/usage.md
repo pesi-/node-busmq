@@ -680,7 +680,7 @@ When in requester mode, no new requests can be made.
 
 * `gracePeriod` - number of milliseconds to wait for any currently in-flight requests to finish handling. 
                   
-## service.request(data[, callback]);
+### service.request(data[, callback]);
 
 Make a request to the service. The `connect()` method must be called before making any requests.
 
