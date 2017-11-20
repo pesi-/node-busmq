@@ -7,9 +7,9 @@ How to use BusMQ
 ## Bus
 
 The bus holds connections to one or more redis instances and is used
-to create `queue`s, `channel`s, `pubsub`s and `persistent` objects.
+to create `queue`s, `channel`s, `service`s, `pubsub`s and `persistent` objects.
 
-Node processes connecting to the same bus have access to and can use all queues, channels pubsubs and persistent objects.
+Node processes connecting to the same bus have access to and can use all queues, channels, services, pubsubs and persistent objects.
 
 busmq uses by default [node_redis](https://github.com/mranney/node_redis) as the communication driver,
 but ioredis may also be used, and in fact is mandatory when connecting to a cluster or sentinels.
@@ -113,6 +113,14 @@ Create a new [Pubsub](#pubsub) instance.
 
 Returns a new Pubsub instance.
 
+### bus.service(name)
+
+Create a new [Service](#service) object instance.
+
+* `name` - the name of the service.
+
+Returns a new Service instance. Call `service.serve` or `service.connect` before using service instance.
+
 ### bus.persistify(name, object, properties)
 
 Create a new [Persistable](#persistable) object. Persistifying an object adds additional methods to the persistified object.
@@ -127,7 +135,7 @@ See the  API for more details.
 Federate `object` to the specified `target` instead of hosting the object on the local redis servers.
 Do not use any of the object API's before federation setup is complete.
 
-* `object` - `queue`, `channel` or `persisted` objects to federate. These are created normally through `bus.queue`, `bus.channel` and `bus.persistify`.
+* `object` - `queue`, `channel`, `service` or `persisted` objects to federate. These are created normally through `bus.queue`, `bus.channel`, `bus.service` and `bus.persistify`.
 * `target` - the target bus url or an already open websocket to the target bus. The url has the form `http[s]://<location>[:<port>]`
 
 ### Bus Events
@@ -594,6 +602,100 @@ Start a periodic timer to continuously mark the persisted object as being used.
 ### persistable.unpersist()
 
 Stop the periodic timer. This will cause object to expire after the defined ttl provided in the persist method.
+
+## Service
+
+A service endpoint for implementing the microservices architecture.
+
+A service object can either be serving requests or making requests. 
+Any number of service objects can handle requests, as well as any mumber of clients 
+can make requests to the service.
+
+Requests to a service have the request/response form - a requester sends a request to the service, the service
+handles the request and then sends a reply (or error) back to the requester.
+
+Services do not operate in reliable mode, that is, if a request is being handled but the service
+handler crashes, the request is lost.
+
+### Making Requests
+
+```
+var Bus = require('busmq');
+var bus = Bus.create({redis: ['redis://127.0.0.1:6379']});
+bus.on('online', function() {
+  var s = bus.service('foo');
+  s.on('connected', function() {
+    console.log('connected to the service');
+  });
+  s.connect();
+  s.request({hello: 'world'}, function(err, reply) {
+    console.log('the service replied with ' + reply.thisis);
+  });
+  // this request does not have a reply
+  s.request({hello: 'again'});
+});
+bus.connect();
+```
+
+### Handling Requests
+
+```
+var Bus = require('busmq');
+var bus = Bus.create({redis: ['redis://127.0.0.1:6379']});
+bus.on('online', function() {
+  var s = bus.service('foo');
+  s.on('serving', function() {
+    console.log('serving. requests will soon start flowing in...');
+  });
+  s.on('request', function(request, reply) {
+    console.log('Hey! a new request just got in: ' + request.hello);
+    // send the reply back to the requester
+    reply(null, {thisis: 'my reply'});
+  });
+  // start serving requests
+  s.serve();
+});
+bus.connect();
+```
+
+### service.serve()
+
+Start serving requests made to the service. The `request` event will be fired when a new request arrives.
+
+The `request` event callback must have the form `function(request, reply)` where:
+
+* `request` - the request data that the requester has sent
+* `reply` - a function of the form `function(err, reply)` to send the reply back to the requester. A service provider MUST invoke the `reply` function 
+            to indicate the end of the request processing even if no reply is sent back to the requester.
+
+### service.connect()
+
+Connect to the service to start making requests.
+
+### service.diconnect([gracePeriod])
+
+Disconnect from the service. This should be called by both a service provider and a service consumer.
+When in serving mode, no new requests will arrive.
+When in requester mode, no new requests can be made.
+
+* `gracePeriod` - number of milliseconds to wait for any currently in-flight requests to finish handling. 
+                  
+## service.request(data[, callback]);
+
+Make a request to the service. The `connect()` method must be called before making any requests.
+
+* `data` - the request data to send to the service. Can be a string or an object.
+* `callback` - a callback of the form `function(err, reply)` that will be invoked with the reply from the service. 
+               If ommitted, no reply will be sent (or received) from the service.
+
+### Service Events
+
+* `serving` - emitted when the service will start receiving `request` events
+* `connected` - emitted once connected to the service as a consumer
+* `disconnected` - emitted when disconnected from the service
+* `request` - emitted when a request is received from a requester. The event handler should have the form `(request, reply)`, where `request` is the 
+              data the requester sent, and `reply` is a function that the revice handler invokes once handling is done.
+* `error` - emitted when an error occurs. The listener callback receives the error.
 
 ## Publish/Subscribe
 

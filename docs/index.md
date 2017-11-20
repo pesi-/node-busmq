@@ -8,8 +8,9 @@ BusMQ is a production grade message bus for node.js backed by [Redis](http://red
 
 * Event based message queues
 * Event based bi-directional channels for peer-to-peer communication (backed by message queues)
-* Reliable delivery of messages (AKA Guaranteed Delivery)
+* Service endpoints based on request/response for microservices architecture
 * Publish/Subscribe channels
+* Reliable delivery of messages (AKA Guaranteed Delivery)
 * Persistent Publish/Subscribe (backed by message queues)
 * Federation over distributed data centers
 * Discoverable queues over federation
