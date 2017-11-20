@@ -94,6 +94,8 @@
             <li><a href="#queue">Queue</a></li>
             <li><a href="#channel">Channel</a></li>
             <li><a href="#persistable">Persistable</a></li>
+            <li><a href="#service">Service</a></li>
+            <li><a href="#servicerequestdata-callback">service.request(data[, callback]);</a></li>
             <li><a href="#publishsubscribe">Publish/Subscribe</a></li>
             <li><a href="#federation">Federation</a></li>
             <li><a href="#browser-support">Browser Support</a></li>
@@ -106,8 +108,8 @@
 <hr />
 <h2 id="bus">Bus<a class="headerlink" href="#bus" title="Permanent link"></a></h2>
 <p>The bus holds connections to one or more redis instances and is used
-to create <code>queue</code>s, <code>channel</code>s, <code>pubsub</code>s and <code>persistent</code> objects.</p>
-<p>Node processes connecting to the same bus have access to and can use all queues, channels pubsubs and persistent objects.</p>
+to create <code>queue</code>s, <code>channel</code>s, <code>service</code>s, <code>pubsub</code>s and <code>persistent</code> objects.</p>
+<p>Node processes connecting to the same bus have access to and can use all queues, channels, services, pubsubs and persistent objects.</p>
 <p>busmq uses by default <a href="https://github.com/mranney/node_redis">node_redis</a> as the communication driver,
 but ioredis may also be used, and in fact is mandatory when connecting to a cluster or sentinels.
 Use the <code>driver</code> option when creating the bus instance.</p>
@@ -190,6 +192,12 @@ If the bus gets disconnected from the the redis instances, the <code>offline</co
 <li><code>name</code> - the name of the pubsub channel.</li>
 </ul>
 <p>Returns a new Pubsub instance.</p>
+<h3 id="busservicename">bus.service(name)<a class="headerlink" href="#busservicename" title="Permanent link"></a></h3>
+<p>Create a new <a href="#service">Service</a> object instance.</p>
+<ul>
+<li><code>name</code> - the name of the service.</li>
+</ul>
+<p>Returns a new Service instance. Call <code>service.serve</code> or <code>service.connect</code> before using service instance.</p>
 <h3 id="buspersistifyname-object-properties">bus.persistify(name, object, properties)<a class="headerlink" href="#buspersistifyname-object-properties" title="Permanent link"></a></h3>
 <p>Create a new <a href="#persistable">Persistable</a> object. Persistifying an object adds additional methods to the persistified object.
 See the  API for more details.</p>
@@ -202,7 +210,7 @@ See the  API for more details.</p>
 <p>Federate <code>object</code> to the specified <code>target</code> instead of hosting the object on the local redis servers.
 Do not use any of the object API's before federation setup is complete.</p>
 <ul>
-<li><code>object</code> - <code>queue</code>, <code>channel</code> or <code>persisted</code> objects to federate. These are created normally through <code>bus.queue</code>, <code>bus.channel</code> and <code>bus.persistify</code>.</li>
+<li><code>object</code> - <code>queue</code>, <code>channel</code>, <code>service</code> or <code>persisted</code> objects to federate. These are created normally through <code>bus.queue</code>, <code>bus.channel</code>, <code>bus.service</code> and <code>bus.persistify</code>.</li>
 <li><code>target</code> - the target bus url or an already open websocket to the target bus. The url has the form <code>http[s]://&lt;location&gt;[:&lt;port&gt;]</code></li>
 </ul>
 <h3 id="bus-events">Bus Events<a class="headerlink" href="#bus-events" title="Permanent link"></a></h3>
@@ -580,6 +588,85 @@ where <code>exists</code> is true if the persisted object was found in the bus a
 </ul>
 <h3 id="persistableunpersist">persistable.unpersist()<a class="headerlink" href="#persistableunpersist" title="Permanent link"></a></h3>
 <p>Stop the periodic timer. This will cause object to expire after the defined ttl provided in the persist method.</p>
+<h2 id="service">Service<a class="headerlink" href="#service" title="Permanent link"></a></h2>
+<p>A service endpoint for implementing the microservices architecture.</p>
+<p>A service object can either be serving requests or making requests. 
+Any number of service objects can handle requests, as well as any mumber of clients 
+can make requests to the service.</p>
+<p>Requests to a service have the request/response form - a requester sends a request to the service, the service
+handles the request and then sends a reply (or error) back to the requester.</p>
+<p>Services do not operate in reliable mode, that is, if a request is being handled but the service
+handler crashes, the request is lost.</p>
+<h3 id="making-requests">Making Requests<a class="headerlink" href="#making-requests" title="Permanent link"></a></h3>
+<pre><code>var Bus = require('busmq');
+var bus = Bus.create({redis: ['redis://127.0.0.1:6379']});
+bus.on('online', function() {
+  var s = bus.service('foo');
+  s.on('connected', function() {
+    console.log('connected to the service');
+  });
+  s.connect();
+  s.request({hello: 'world'}, function(err, reply) {
+    console.log('the service replied with ' + reply.thisis);
+  });
+  // this request does not have a reply
+  s.request({hello: 'again'});
+});
+bus.connect();
+</code></pre>
+
+<h3 id="handling-requests">Handling Requests<a class="headerlink" href="#handling-requests" title="Permanent link"></a></h3>
+<pre><code>var Bus = require('busmq');
+var bus = Bus.create({redis: ['redis://127.0.0.1:6379']});
+bus.on('online', function() {
+  var s = bus.service('foo');
+  s.on('serving', function() {
+    console.log('serving. requests will soon start flowing in...');
+  });
+  s.on('request', function(request, reply) {
+    console.log('Hey! a new request just got in: ' + request.hello);
+    // send the reply back to the requester
+    reply(null, {thisis: 'my reply'});
+  });
+  // start serving requests
+  s.serve();
+});
+bus.connect();
+</code></pre>
+
+<h3 id="serviceserve">service.serve()<a class="headerlink" href="#serviceserve" title="Permanent link"></a></h3>
+<p>Start serving requests made to the service. The <code>request</code> event will be fired when a new request arrives.</p>
+<p>The <code>request</code> event callback must have the form <code>function(request, reply)</code> where:</p>
+<ul>
+<li><code>request</code> - the request data that the requester has sent</li>
+<li><code>reply</code> - a function of the form <code>function(err, reply)</code> to send the reply back to the requester. A service provider MUST invoke the <code>reply</code> function 
+            to indicate the end of the request processing even if no reply is sent back to the requester.</li>
+</ul>
+<h3 id="serviceconnect">service.connect()<a class="headerlink" href="#serviceconnect" title="Permanent link"></a></h3>
+<p>Connect to the service to start making requests.</p>
+<h3 id="servicediconnectgraceperiod">service.diconnect([gracePeriod])<a class="headerlink" href="#servicediconnectgraceperiod" title="Permanent link"></a></h3>
+<p>Disconnect from the service. This should be called by both a service provider and a service consumer.
+When in serving mode, no new requests will arrive.
+When in requester mode, no new requests can be made.</p>
+<ul>
+<li><code>gracePeriod</code> - number of milliseconds to wait for any currently in-flight requests to finish handling. </li>
+</ul>
+<h2 id="servicerequestdata-callback">service.request(data[, callback]);<a class="headerlink" href="#servicerequestdata-callback" title="Permanent link"></a></h2>
+<p>Make a request to the service. The <code>connect()</code> method must be called before making any requests.</p>
+<ul>
+<li><code>data</code> - the request data to send to the service. Can be a string or an object.</li>
+<li><code>callback</code> - a callback of the form <code>function(err, reply)</code> that will be invoked with the reply from the service. 
+               If ommitted, no reply will be sent (or received) from the service.</li>
+</ul>
+<h3 id="service-events">Service Events<a class="headerlink" href="#service-events" title="Permanent link"></a></h3>
+<ul>
+<li><code>serving</code> - emitted when the service will start receiving <code>request</code> events</li>
+<li><code>connected</code> - emitted once connected to the service as a consumer</li>
+<li><code>disconnected</code> - emitted when disconnected from the service</li>
+<li><code>request</code> - emitted when a request is received from a requester. The event handler should have the form <code>(request, reply)</code>, where <code>request</code> is the 
+              data the requester sent, and <code>reply</code> is a function that the revice handler invokes once handling is done.</li>
+<li><code>error</code> - emitted when an error occurs. The listener callback receives the error.</li>
+</ul>
 <h2 id="publishsubscribe">Publish/Subscribe<a class="headerlink" href="#publishsubscribe" title="Permanent link"></a></h2>
 <p>A plain old publish/subscribe channel. These channels are not backed by queues, so any subscriber not subscribed at the
 time a message is published will not receive the message.</p>
