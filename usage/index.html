@@ -588,28 +588,31 @@ where <code>exists</code> is true if the persisted object was found in the bus a
 <h3 id="persistableunpersist">persistable.unpersist()<a class="headerlink" href="#persistableunpersist" title="Permanent link"></a></h3>
 <p>Stop the periodic timer. This will cause object to expire after the defined ttl provided in the persist method.</p>
 <h2 id="service">Service<a class="headerlink" href="#service" title="Permanent link"></a></h2>
-<p>A service endpoint for implementing the microservices architecture.</p>
-<p>A service object can either be serving requests or making requests. 
-Any number of service objects can handle requests, as well as any mumber of clients 
-can make requests to the service.</p>
+<p>A service endpoint for implementing microservice architectures.</p>
+<p>A service object can either be serving requests or making requests, but it can't do both.</p>
 <p>Requests to a service have the request/response form - a requester sends a request to the service, the service
 handles the request and then sends a reply (or error) back to the requester.</p>
+<p>Any number of service objects can handle requests, as well as any mumber of clients 
+can make requests to the service. When there are multiple service objects serving the same service enpoint,
+only one will ever receive any single request</p>
 <p>Services do not operate in reliable mode, that is, if a request is being handled but the service
 handler crashes, the request is lost.</p>
 <h3 id="making-requests">Making Requests<a class="headerlink" href="#making-requests" title="Permanent link"></a></h3>
 <pre><code>var Bus = require('busmq');
 var bus = Bus.create({redis: ['redis://127.0.0.1:6379']});
 bus.on('online', function() {
-  var s = bus.service('foo');
-  s.on('connected', function() {
+  // create a service object to make requests
+  var requester = bus.service('foo');
+  // connect to the service so we can make requests
+  requester.connect(function() {
     console.log('connected to the service');
   });
-  s.connect();
-  s.request({hello: 'world'}, function(err, reply) {
+  // make a request and receive a reply
+  requester.request({hello: 'world'}, function(err, reply) {
     console.log('the service replied with ' + reply.thisis);
   });
   // this request does not have a reply
-  s.request({hello: 'again'});
+  requester.request({hello: 'again'});
 });
 bus.connect();
 </code></pre>
@@ -618,17 +621,18 @@ bus.connect();
 <pre><code>var Bus = require('busmq');
 var bus = Bus.create({redis: ['redis://127.0.0.1:6379']});
 bus.on('online', function() {
-  var s = bus.service('foo');
-  s.on('serving', function() {
-    console.log('serving. requests will soon start flowing in...');
-  });
-  s.on('request', function(request, reply) {
+  // create a service object to handle requests
+  var handler = bus.service('foo');
+  // handle requests
+  handler.on('request', function(request, reply) {
     console.log('Hey! a new request just got in: ' + request.hello);
     // send the reply back to the requester
     reply(null, {thisis: 'my reply'});
   });
   // start serving requests
-  s.serve();
+  handler.serve(function() {
+    console.log('serving. requests will soon start flowing in...');
+  });
 });
 bus.connect();
 </code></pre>
@@ -638,12 +642,13 @@ bus.connect();
 <p>The <code>request</code> event callback must have the form <code>function(request, reply)</code> where:</p>
 <ul>
 <li><code>request</code> - the request data that the requester has sent</li>
-<li><code>reply</code> - a function of the form <code>function(err, reply)</code> to send the reply back to the requester. A service provider MUST invoke the <code>reply</code> function 
-            to indicate the end of the request processing even if no reply is sent back to the requester.</li>
+<li><code>reply</code> - a function of the form <code>function(err, reply)</code> to send the reply back to the requester. 
+            A service provider MUST invoke the <code>reply()</code> function to indicate the end of the request 
+            processing even if no reply is sent back to the requester.</li>
 </ul>
 <h3 id="serviceconnect">service.connect()<a class="headerlink" href="#serviceconnect" title="Permanent link"></a></h3>
 <p>Connect to the service to start making requests.</p>
-<h3 id="servicediconnectgraceperiod">service.diconnect([gracePeriod])<a class="headerlink" href="#servicediconnectgraceperiod" title="Permanent link"></a></h3>
+<h3 id="servicedisconnectgraceperiod">service.disconnect([gracePeriod])<a class="headerlink" href="#servicedisconnectgraceperiod" title="Permanent link"></a></h3>
 <p>Disconnect from the service. This should be called by both a service provider and a service consumer.
 When in serving mode, no new requests will arrive.
 When in requester mode, no new requests can be made.</p>
