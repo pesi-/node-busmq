@@ -637,8 +637,11 @@ bus.on('online', function() {
 bus.connect();
 </code></pre>
 
-<h3 id="serviceserve">service.serve()<a class="headerlink" href="#serviceserve" title="Permanent link"></a></h3>
+<h3 id="serviceservecallback">service.serve([callback])<a class="headerlink" href="#serviceservecallback" title="Permanent link"></a></h3>
 <p>Start serving requests made to the service. The <code>request</code> event will be fired when a new request arrives.</p>
+<ul>
+<li><code>callback</code> - one time listener for the <code>serving</code> event</li>
+</ul>
 <p>The <code>request</code> event callback must have the form <code>function(request, reply)</code> where:</p>
 <ul>
 <li><code>request</code> - the request data that the requester has sent</li>
@@ -646,8 +649,13 @@ bus.connect();
             A service provider MUST invoke the <code>reply()</code> function to indicate the end of the request 
             processing even if no reply is sent back to the requester.</li>
 </ul>
-<h3 id="serviceconnect">service.connect()<a class="headerlink" href="#serviceconnect" title="Permanent link"></a></h3>
+<h3 id="serviceconnectoptions-callback">service.connect([options, callback])<a class="headerlink" href="#serviceconnectoptions-callback" title="Permanent link"></a></h3>
 <p>Connect to the service to start making requests.</p>
+<ul>
+<li><code>options</code> - connection options:</li>
+<li><code>reqTimeout</code> - default request timeout for all requests</li>
+<li><code>callback</code> - one time listener for the <code>connected</code> event</li>
+</ul>
 <h3 id="servicedisconnectgraceperiod">service.disconnect([gracePeriod])<a class="headerlink" href="#servicedisconnectgraceperiod" title="Permanent link"></a></h3>
 <p>Disconnect from the service. This should be called by both a service provider and a service consumer.
 When in serving mode, no new requests will arrive.
@@ -655,10 +663,12 @@ When in requester mode, no new requests can be made.</p>
 <ul>
 <li><code>gracePeriod</code> - number of milliseconds to wait for any currently in-flight requests to finish handling. </li>
 </ul>
-<h3 id="servicerequestdata-callback">service.request(data[, callback]);<a class="headerlink" href="#servicerequestdata-callback" title="Permanent link"></a></h3>
+<h3 id="servicerequestdata-options-callback">service.request(data[, options [, callback]]);<a class="headerlink" href="#servicerequestdata-options-callback" title="Permanent link"></a></h3>
 <p>Make a request to the service. The <code>connect()</code> method must be called before making any requests.</p>
 <ul>
 <li><code>data</code> - the request data to send to the service. Can be a string or an object.</li>
+<li><code>options</code> - request options:</li>
+<li><code>reqTimeout</code> - request timeout, overriding the default request timeout</li>
 <li><code>callback</code> - a callback of the form <code>function(err, reply)</code> that will be invoked with the reply from the service. 
                If ommitted, no reply will be sent (or received) from the service.</li>
 </ul>
