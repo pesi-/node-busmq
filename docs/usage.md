@@ -663,9 +663,11 @@ bus.on('online', function() {
 bus.connect();
 ```
 
-### service.serve()
+### service.serve([callback])
 
 Start serving requests made to the service. The `request` event will be fired when a new request arrives.
+
+* `callback` - one time listener for the `serving` event
 
 The `request` event callback must have the form `function(request, reply)` where:
 
@@ -674,9 +676,13 @@ The `request` event callback must have the form `function(request, reply)` where
             A service provider MUST invoke the `reply()` function to indicate the end of the request 
             processing even if no reply is sent back to the requester.
 
-### service.connect()
+### service.connect([options, callback])
 
 Connect to the service to start making requests.
+
+* `options` - connection options:
+  * `reqTimeout` - default request timeout for all requests
+* `callback` - one time listener for the `connected` event
 
 ### service.disconnect([gracePeriod])
 
@@ -686,11 +692,13 @@ When in requester mode, no new requests can be made.
 
 * `gracePeriod` - number of milliseconds to wait for any currently in-flight requests to finish handling. 
                   
-### service.request(data[, callback]);
+### service.request(data[, options [, callback]]);
 
 Make a request to the service. The `connect()` method must be called before making any requests.
 
 * `data` - the request data to send to the service. Can be a string or an object.
+* `options` - request options:
+  * `reqTimeout` - request timeout, overriding the default request timeout
 * `callback` - a callback of the form `function(err, reply)` that will be invoked with the reply from the service. 
                If ommitted, no reply will be sent (or received) from the service.
 

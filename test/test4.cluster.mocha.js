@@ -226,6 +226,11 @@ describe('BusMQ Cluster', function() {
       tf.serviceServesRequesterPushesNoReply(bus,done);
     });
 
+    it.only('should return timeout error on request timeout', function(done) {
+      var bus = Bus.create({driver: 'ioredis', layout: 'cluster', redis: redisUrls, logger: console});
+      tf.serviceRequestTimeout(bus,done);
+    });
+
     it('should garcefully shutdown', function(done) {
       var bus = Bus.create({driver: 'ioredis', layout: 'cluster', redis: redisUrls, logger: console});
       tf.serviceGracefulShutdown(bus,done);

@@ -223,6 +223,11 @@ describe('BusMQ direct connectivity using node-redis', function() {
       tf.serviceServesRequesterPushesNoReply(bus,done);
     });
 
+    it('should return timeout error on request timeout', function(done) {
+      var bus = Bus.create({redis: redisUrls, logger: console});
+      tf.serviceRequestTimeout(bus,done);
+    });
+
     it('should garcefully shutdown', function(done) {
       var bus = Bus.create({redis: redisUrls, logger: console});
       tf.serviceGracefulShutdown(bus,done);
