@@ -605,14 +605,16 @@ Stop the periodic timer. This will cause object to expire after the defined ttl 
 
 ## Service
 
-A service endpoint for implementing the microservices architecture.
+A service endpoint for implementing microservice architectures.
 
-A service object can either be serving requests or making requests. 
-Any number of service objects can handle requests, as well as any mumber of clients 
-can make requests to the service.
+A service object can either be serving requests or making requests, but it can't do both.
 
 Requests to a service have the request/response form - a requester sends a request to the service, the service
 handles the request and then sends a reply (or error) back to the requester.
+
+Any number of service objects can handle requests, as well as any mumber of clients 
+can make requests to the service. When there are multiple service objects serving the same service enpoint,
+only one will ever receive any single request
 
 Services do not operate in reliable mode, that is, if a request is being handled but the service
 handler crashes, the request is lost.
@@ -623,16 +625,18 @@ handler crashes, the request is lost.
 var Bus = require('busmq');
 var bus = Bus.create({redis: ['redis://127.0.0.1:6379']});
 bus.on('online', function() {
-  var s = bus.service('foo');
-  s.on('connected', function() {
+  // create a service object to make requests
+  var requester = bus.service('foo');
+  // connect to the service so we can make requests
+  requester.connect(function() {
     console.log('connected to the service');
   });
-  s.connect();
-  s.request({hello: 'world'}, function(err, reply) {
+  // make a request and receive a reply
+  requester.request({hello: 'world'}, function(err, reply) {
     console.log('the service replied with ' + reply.thisis);
   });
   // this request does not have a reply
-  s.request({hello: 'again'});
+  requester.request({hello: 'again'});
 });
 bus.connect();
 ```
@@ -643,17 +647,18 @@ bus.connect();
 var Bus = require('busmq');
 var bus = Bus.create({redis: ['redis://127.0.0.1:6379']});
 bus.on('online', function() {
-  var s = bus.service('foo');
-  s.on('serving', function() {
-    console.log('serving. requests will soon start flowing in...');
-  });
-  s.on('request', function(request, reply) {
+  // create a service object to handle requests
+  var handler = bus.service('foo');
+  // handle requests
+  handler.on('request', function(request, reply) {
     console.log('Hey! a new request just got in: ' + request.hello);
     // send the reply back to the requester
     reply(null, {thisis: 'my reply'});
   });
   // start serving requests
-  s.serve();
+  handler.serve(function() {
+    console.log('serving. requests will soon start flowing in...');
+  });
 });
 bus.connect();
 ```
@@ -665,14 +670,15 @@ Start serving requests made to the service. The `request` event will be fired wh
 The `request` event callback must have the form `function(request, reply)` where:
 
 * `request` - the request data that the requester has sent
-* `reply` - a function of the form `function(err, reply)` to send the reply back to the requester. A service provider MUST invoke the `reply` function 
-            to indicate the end of the request processing even if no reply is sent back to the requester.
+* `reply` - a function of the form `function(err, reply)` to send the reply back to the requester. 
+            A service provider MUST invoke the `reply()` function to indicate the end of the request 
+            processing even if no reply is sent back to the requester.
 
 ### service.connect()
 
 Connect to the service to start making requests.
 
-### service.diconnect([gracePeriod])
+### service.disconnect([gracePeriod])
 
 Disconnect from the service. This should be called by both a service provider and a service consumer.
 When in serving mode, no new requests will arrive.
