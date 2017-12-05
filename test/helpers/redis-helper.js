@@ -5,7 +5,7 @@ var events = require('events');
 var redis = require('redis');
 
 var childProcess = require('child_process')
-  , keyRE = /(port:\s+\d+)|(pid:\s+\d+)|(already\s+in\s+use)|(not\s+listen)|error|denied|(server\s+is\s+now\s+ready)|(sentinel\s+runid)/ig
+  , keyRE = /(port:\s+\d+)|(pid:\s+\d+)|(already\s+in\s+use)|(not\s+listen)|error|denied|(server\s+is\s+now\s+ready)|(ready\s+to\s+accept\s+connections)|(sentinel\s+runid)/ig
   , strRE = / /ig;
 
 function RedisHelper() {
@@ -53,6 +53,7 @@ RedisHelper.prototype.open = function(args, done) {
         return _this.emit('error', _this.process.pid + ': Invalid port number');
 
       case 'serverisnowready':
+      case 'readytoacceptconnections':
       case 'sentinelrunid':
         _this.isOpening = false;
         // _this.client = redis.createClient(_this.port, '127.0.0.1', {auth_pass: _this.auth});
