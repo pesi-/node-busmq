@@ -89,6 +89,14 @@ Disconnect from the redis instances and stop the federation server. Once disconn
 
 Return `true` if the bus is online, `false` if the bus offline.
 
+### bus.connection(key, cb)
+
+Provide a connection to redis for the specified key. If the key already exists, then a connection to the correct redis is provided.
+Otherwise, a connection to the correct redis is calculated from the key.
+
+* `key` - the key to get the connection for
+* `cb` - callback of the form `function(connection)`. Note that the provided connection object exposes redis commands directly.
+
 ### bus.queue(name)
 
 Create a new [Queue](#queue) instance.
