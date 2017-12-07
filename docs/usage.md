@@ -138,6 +138,13 @@ See the  API for more details.
 * `object` - the object to persistify.
 * `properties` - an array of property names to persist.
 
+### bus.promisify(object)
+
+Convert all eligible methods in the provided object into promise based methods instead of callback based methods.
+Once the methods are promisified, it is possible to use them with async/await.
+
+* `object` - one of `queue`, `channel`, `pubsub`, `service`
+
 ### bus.federate(object, target)
 
 Federate `object` to the specified `target` instead of hosting the object on the local redis servers.
