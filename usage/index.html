@@ -212,6 +212,12 @@ See the  API for more details.</p>
 <li><code>object</code> - the object to persistify.</li>
 <li><code>properties</code> - an array of property names to persist.</li>
 </ul>
+<h3 id="buspromisifyobject">bus.promisify(object)<a class="headerlink" href="#buspromisifyobject" title="Permanent link"></a></h3>
+<p>Convert all eligible methods in the provided object into promise based methods instead of callback based methods.
+Once the methods are promisified, it is possible to use them with async/await.</p>
+<ul>
+<li><code>object</code> - one of <code>queue</code>, <code>channel</code>, <code>pubsub</code>, <code>service</code></li>
+</ul>
 <h3 id="busfederateobject-target">bus.federate(object, target)<a class="headerlink" href="#busfederateobject-target" title="Permanent link"></a></h3>
 <p>Federate <code>object</code> to the specified <code>target</code> instead of hosting the object on the local redis servers.
 Do not use any of the object API's before federation setup is complete.</p>
