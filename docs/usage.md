@@ -138,12 +138,14 @@ See the  API for more details.
 * `object` - the object to persistify.
 * `properties` - an array of property names to persist.
 
-### bus.promisify(object)
+### bus.promisify(object, methods)
 
-Convert all eligible methods in the provided object into promise based methods instead of callback based methods.
+Convert the specified methods in the provided object into promise based methods instead of callback based methods.
 Once the methods are promisified, it is possible to use them with async/await.
+Returns the object itself.
 
-* `object` - one of `queue`, `channel`, `pubsub`, `service`
+* `object` - the object to convert the specified methods to promise based
+* `methods` - array of method names in the object to convert
 
 ### bus.federate(object, target)
 
@@ -390,6 +392,15 @@ Returns the number of messages consumed by this client from the queue
 
 * `callback` - receives `err` and the number of consumed messages
 
+### queue.promisify()
+
+Convert the elligible methods to promise based methods instead of callback based. 
+Returns the same object so that the following can be done: 
+
+```javascript
+var queue = bus.queue('foo').promisify();
+```
+
 ### Queue Events
 
 * `attaching` - emitted when starting to attach
@@ -550,6 +561,15 @@ See [queue.ack](#queueackid) for details
 ### channel.isAttached([callback])
 
 Returns `true` if connected to the channel, `false` if not connected.
+
+### channel.promisify()
+
+Convert the elligible methods to promise based methods instead of callback based. 
+Returns the same object so that the following can be done: 
+
+```javascript
+var channel = bus.channel('foo').promisify();
+```
 
 ### Channel Events
 
@@ -717,6 +737,15 @@ Make a request to the service. The `connect()` method must be called before maki
 * `callback` - a callback of the form `function(err, reply)` that will be invoked with the reply from the service. 
                If ommitted, no reply will be sent (or received) from the service.
 
+### service.promisify()
+
+Convert the elligible methods to promise based methods instead of callback based. 
+Returns the same object so that the following can be done: 
+
+```javascript
+var service = bus.service('foo').promisify();
+```
+
 ### Service Events
 
 * `serving` - emitted when the service will start receiving `request` events
@@ -767,6 +796,15 @@ Unsubscribes from messages on the pubsub channel. Messages can still be publishe
 ### pubsub.isSubscribed()
 
 Returns `true` if subscribed to messages from the pubsub channel, `false` if not.
+
+### pubsub.promisify()
+
+Convert the elligible methods to promise based methods instead of callback based. 
+Returns the same object so that the following can be done: 
+
+```javascript
+var pubsub = bus.pubsub('foo').promisify();
+```
 
 ### Pubsub Events
 
