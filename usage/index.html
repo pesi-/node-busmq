@@ -212,11 +212,13 @@ See the  API for more details.</p>
 <li><code>object</code> - the object to persistify.</li>
 <li><code>properties</code> - an array of property names to persist.</li>
 </ul>
-<h3 id="buspromisifyobject">bus.promisify(object)<a class="headerlink" href="#buspromisifyobject" title="Permanent link"></a></h3>
-<p>Convert all eligible methods in the provided object into promise based methods instead of callback based methods.
-Once the methods are promisified, it is possible to use them with async/await.</p>
+<h3 id="buspromisifyobject-methods">bus.promisify(object, methods)<a class="headerlink" href="#buspromisifyobject-methods" title="Permanent link"></a></h3>
+<p>Convert the specified methods in the provided object into promise based methods instead of callback based methods.
+Once the methods are promisified, it is possible to use them with async/await.
+Returns the object itself.</p>
 <ul>
-<li><code>object</code> - one of <code>queue</code>, <code>channel</code>, <code>pubsub</code>, <code>service</code></li>
+<li><code>object</code> - the object to convert the specified methods to promise based</li>
+<li><code>methods</code> - array of method names in the object to convert</li>
 </ul>
 <h3 id="busfederateobject-target">bus.federate(object, target)<a class="headerlink" href="#busfederateobject-target" title="Permanent link"></a></h3>
 <p>Federate <code>object</code> to the specified <code>target</code> instead of hosting the object on the local redis servers.
@@ -414,6 +416,12 @@ if retrieving the value, it is called with the retrieved value.</li>
 <ul>
 <li><code>callback</code> - receives <code>err</code> and the number of consumed messages</li>
 </ul>
+<h3 id="queuepromisify">queue.promisify()<a class="headerlink" href="#queuepromisify" title="Permanent link"></a></h3>
+<p>Convert the elligible methods to promise based methods instead of callback based. 
+Returns the same object so that the following can be done: </p>
+<pre><code class="javascript">var queue = bus.queue('foo').promisify();
+</code></pre>
+
 <h3 id="queue-events">Queue Events<a class="headerlink" href="#queue-events" title="Permanent link"></a></h3>
 <ul>
 <li><code>attaching</code> - emitted when starting to attach</li>
@@ -541,6 +549,12 @@ The <code>connect</code> event is emitted once connected to the channel.</p>
 <p>See <a href="#queueackid">queue.ack</a> for details</p>
 <h3 id="channelisattachedcallback">channel.isAttached([callback])<a class="headerlink" href="#channelisattachedcallback" title="Permanent link"></a></h3>
 <p>Returns <code>true</code> if connected to the channel, <code>false</code> if not connected.</p>
+<h3 id="channelpromisify">channel.promisify()<a class="headerlink" href="#channelpromisify" title="Permanent link"></a></h3>
+<p>Convert the elligible methods to promise based methods instead of callback based. 
+Returns the same object so that the following can be done: </p>
+<pre><code class="javascript">var channel = bus.channel('foo').promisify();
+</code></pre>
+
 <h3 id="channel-events">Channel Events<a class="headerlink" href="#channel-events" title="Permanent link"></a></h3>
 <ul>
 <li><code>connect</code> - emitted when connected to the channel</li>
@@ -685,6 +699,12 @@ When in requester mode, no new requests can be made.</p>
 <li><code>callback</code> - a callback of the form <code>function(err, reply)</code> that will be invoked with the reply from the service. 
                If ommitted, no reply will be sent (or received) from the service.</li>
 </ul>
+<h3 id="servicepromisify">service.promisify()<a class="headerlink" href="#servicepromisify" title="Permanent link"></a></h3>
+<p>Convert the elligible methods to promise based methods instead of callback based. 
+Returns the same object so that the following can be done: </p>
+<pre><code class="javascript">var service = bus.service('foo').promisify();
+</code></pre>
+
 <h3 id="service-events">Service Events<a class="headerlink" href="#service-events" title="Permanent link"></a></h3>
 <ul>
 <li><code>serving</code> - emitted when the service will start receiving <code>request</code> events</li>
@@ -725,6 +745,12 @@ from version 1.5.0, the callback no longer receives the number of subscribers th
 <p>Unsubscribes from messages on the pubsub channel. Messages can still be published using the <code>publish</code> method.</p>
 <h3 id="pubsubissubscribed">pubsub.isSubscribed()<a class="headerlink" href="#pubsubissubscribed" title="Permanent link"></a></h3>
 <p>Returns <code>true</code> if subscribed to messages from the pubsub channel, <code>false</code> if not.</p>
+<h3 id="pubsubpromisify">pubsub.promisify()<a class="headerlink" href="#pubsubpromisify" title="Permanent link"></a></h3>
+<p>Convert the elligible methods to promise based methods instead of callback based. 
+Returns the same object so that the following can be done: </p>
+<pre><code class="javascript">var pubsub = bus.pubsub('foo').promisify();
+</code></pre>
+
 <h3 id="pubsub-events">Pubsub Events<a class="headerlink" href="#pubsub-events" title="Permanent link"></a></h3>
 <ul>
 <li><code>subscribed</code> - emitted when subscribed to messages on the pubsub channel</li>
