@@ -9,6 +9,7 @@ var http = require("http");
 //////////////////////////////////////////////
 
 module.exports.onlineOffline = function(bus, done) {
+  var last = false;
   bus.on("error", function(err) {
     done(err);
   });
@@ -16,7 +17,12 @@ module.exports.onlineOffline = function(bus, done) {
     bus.disconnect();
   });
   bus.on("offline", function() {
-    done();
+    if (last) {
+      done();
+    } else {
+      last = true;
+      bus.connect();
+    }
   });
   bus.connect();
 };
