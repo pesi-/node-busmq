@@ -225,9 +225,14 @@ describe('BusMQ direct connectivity using ioredis', function() {
       tf.serviceServesRequesterPushesNoReply(bus,done);
     });
 
-    it.only('should return timeout error on request timeout', function(done) {
+    it('should return timeout error on request timeout', function(done) {
       var bus = Bus.create({driver: 'ioredis', redis: redisUrls, logger: console});
       tf.serviceRequestTimeout(bus,done);
+    });
+
+    it('should serve only 1 request', function(done) {
+      var bus = Bus.create({driver: 'ioredis', redis: redisUrls, logger: console});
+      tf.serviceRequestConsumeMax(bus,done);
     });
 
     it('should garcefully shutdown', function(done) {

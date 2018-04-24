@@ -2297,6 +2297,45 @@ module.exports.serviceRequestTimeout = function(bus, done) {
   bus.connect();
 };
 
+module.exports.serviceRequestConsumeMax = function(bus, done) {
+  var testRequest = { hello: "world" };
+  var count = 0;
+  bus.on("error", done);
+  bus.on("online", function() {
+    var sName = "test111";
+    var s = bus.service(sName);
+    var r = bus.service(sName);
+    s.on("error", done);
+    s.on("disconnect", function() {
+      bus.disconnect();
+    });
+    s.on("request", function(request, reply) {
+      Should(count).be.exactly(0);
+      count++;
+      reply(null, "hi");
+    });
+    s.on("serving", function() {
+      r.on("error", done);
+      r.on("disconnect", function() {
+        s.disconnect();
+      });
+      r.connect();
+      r.request(testRequest, function(err, reply) {
+        Should(err).be.exactly(null);
+        reply.should.be.exactly("hi");
+        r.request(testRequest, {reqTimeout: 200}, function(err, reply) {
+          err.should.be.exactly('timeout');
+          r.disconnect();          
+        });
+      });
+    });
+    s.serve({ max: 1 });
+  });
+  bus.on("offline", done);
+  bus.connect();
+};
+
+
 module.exports.serviceGracefulShutdown = function(bus, done) {
   var testRequest = { hello: "world" };
   var testReply = { hi: "there" };

@@ -20,7 +20,6 @@ describe('BusMQ direct connectivity using node-redis', function() {
   var redisGroup = new RedisGroup(redisPorts,redisAuths);
   var redisUrls = redisGroup.urls;
 
-
   this.timeout(0);
   if (this.timeout() === 0) {
     this.enableTimeouts(false);
@@ -226,6 +225,11 @@ describe('BusMQ direct connectivity using node-redis', function() {
     it('should return timeout error on request timeout', function(done) {
       var bus = Bus.create({redis: redisUrls, logger: console});
       tf.serviceRequestTimeout(bus,done);
+    });
+
+    it('should serve only 1 request', function(done) {
+      var bus = Bus.create({redis: redisUrls, logger: console});
+      tf.serviceRequestConsumeMax(bus,done);
     });
 
     it('should garcefully shutdown', function(done) {
