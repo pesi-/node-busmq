@@ -750,7 +750,7 @@ var service = bus.service('foo').promisify();
 
 * `serving` - emitted when the service will start receiving `request` events
 * `connected` - emitted once connected to the service as a consumer
-* `disconnected` - emitted when disconnected from the service
+* `disconnect` - emitted when disconnected from the service
 * `request` - emitted when a request is received from a requester. The event handler should have the form `(request, reply)`, where `request` is the 
               data the requester sent, and `reply` is a function that the revice handler invokes once handling is done.
 * `error` - emitted when an error occurs. The listener callback receives the error.
