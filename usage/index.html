@@ -709,7 +709,7 @@ Returns the same object so that the following can be done: </p>
 <ul>
 <li><code>serving</code> - emitted when the service will start receiving <code>request</code> events</li>
 <li><code>connected</code> - emitted once connected to the service as a consumer</li>
-<li><code>disconnected</code> - emitted when disconnected from the service</li>
+<li><code>disconnect</code> - emitted when disconnected from the service</li>
 <li><code>request</code> - emitted when a request is received from a requester. The event handler should have the form <code>(request, reply)</code>, where <code>request</code> is the 
               data the requester sent, and <code>reply</code> is a function that the revice handler invokes once handling is done.</li>
 <li><code>error</code> - emitted when an error occurs. The listener callback receives the error.</li>
