@@ -2233,6 +2233,54 @@ module.exports.serviceServesRequesterPushes = function(bus, done) {
   bus.connect();
 };
 
+module.exports.serviceServesRequesterPushesIntermediateReply = function(bus, done) {
+  var testRequest = { hello: "world" };
+  var testReplyIntermediate = { hi: "there" };
+  var testReply = { bye: "now" };
+
+  bus.on("error", done);
+  bus.on("online", function() {
+    var sName = "test" + Math.random();
+    var s = bus.service(sName);
+    var r = bus.service(sName);
+
+    s.on("error", done);
+    s.on("request", function(request, reply) {
+      Should(request).not.be.null;
+      Should(typeof reply).be.exactly("function");
+      Should(reply.replyTo).not.be.null;
+      request.hello.should.be.exactly(testRequest.hello);
+      reply(null, testReplyIntermediate, true);
+      reply(null, testReply);
+    });
+    s.on("disconnect", function() {
+      bus.disconnect();
+    });
+    s.on("serving", function() {
+      r.on("error", done);
+      r.on("disconnect", function() {
+          s.disconnect();
+      });
+      r.connect(function() {
+        r.request(testRequest, { allowIntermediateReply: true }, function(err, reply, intermediateReply) {
+          Should(err).be.exactly(null);
+          Should(reply).not.be.null;
+          Should(intermediateReply).not.be.undefined;
+          if (intermediateReply) {
+            reply.hi.should.be.exactly(testReplyIntermediate.hi);
+          } else {
+            reply.bye.should.be.exactly(testReply.bye);
+            r.disconnect();
+          }
+        });
+      });
+    });
+    s.serve();
+  });
+  bus.on("offline", done);
+  bus.connect();
+};
+
 module.exports.serviceServesRequesterPushesNoReply = function(bus, done) {
   var testRequest = { hello: "world" };
 
