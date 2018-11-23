@@ -618,7 +618,8 @@ where <code>exists</code> is true if the persisted object was found in the bus a
 <p>A service endpoint for implementing microservice architectures.</p>
 <p>A service object can either be serving requests or making requests, but it can't do both.</p>
 <p>Requests to a service have the request/response form - a requester sends a request to the service, the service
-handles the request and then sends a reply (or error) back to the requester.</p>
+handles the request and then sends a reply (or error) back to the requester. </p>
+<p>Replies can be streamed instead of sending them as a single response. This is useful in cases where the respose is large.</p>
 <p>Any number of service objects can handle requests, as well as any mumber of clients 
 can make requests to the service. When there are multiple service objects serving the same service enpoint,
 only one will ever receive any single request</p>
@@ -634,10 +635,23 @@ bus.on('online', function() {
   requester.connect(function() {
     console.log('connected to the service');
   });
+
   // make a request and receive a reply
   requester.request({hello: 'world'}, function(err, reply) {
     console.log('the service replied with ' + reply.thisis);
   });
+
+  // make a request and receive a streaming reply
+  requester.request({hello: 'world'}, {streamReply: true}, function(err, reply) {
+    // reply is a Readable stream
+    reply.on(&quot;data&quot;, function(data) {
+      console.log('the service replied with ' + data.thisis);
+    });
+    reply.on(&quot;end&quot;, function() {
+      // no more data in the reply
+    });
+  });
+
   // this request does not have a reply
   requester.request({hello: 'again'});
 });
@@ -650,12 +664,25 @@ var bus = Bus.create({redis: ['redis://127.0.0.1:6379']});
 bus.on('online', function() {
   // create a service object to handle requests
   var handler = bus.service('foo');
+
   // handle requests
   handler.on('request', function(request, reply) {
     console.log('Hey! a new request just got in: ' + request.hello);
     // send the reply back to the requester
     reply(null, {thisis: 'my reply'});
   });
+
+  // handle requests with a streaming response
+  handler.on('request', function(request, reply) {
+    console.log('Hey! a new request just got in: ' + request.hello);
+    // stream the reply back to the requester
+    var st = reply.createWriteStream();
+    st.write({thisis: 'a first chunk'});
+    st.write({thisis: 'another chunk'});
+    st.write({thisis: 'last one!'});
+    st.end();
+  });
+
   // start serving requests
   handler.serve(function() {
     console.log('serving. requests will soon start flowing in...');
@@ -696,6 +723,7 @@ When in requester mode, no new requests can be made.</p>
 <li><code>data</code> - the request data to send to the service. Can be a string or an object.</li>
 <li><code>options</code> - request options:</li>
 <li><code>reqTimeout</code> - request timeout, overriding the default request timeout</li>
+<li><code>streamReply</code> - the <code>reply</code> received in the callback will be a <a href="https://nodejs.org/api/stream.html#stream_class_stream_readable">Readable stream</a> instead of the actual response.</li>
 <li><code>callback</code> - a callback of the form <code>function(err, reply)</code> that will be invoked with the reply from the service. 
                If ommitted, no reply will be sent (or received) from the service.</li>
 </ul>
@@ -710,8 +738,7 @@ Returns the same object so that the following can be done: </p>
 <li><code>serving</code> - emitted when the service will start receiving <code>request</code> events</li>
 <li><code>connected</code> - emitted once connected to the service as a consumer</li>
 <li><code>disconnect</code> - emitted when disconnected from the service</li>
-<li><code>request</code> - emitted when a request is received from a requester. The event handler should have the form <code>(request, reply)</code>, where <code>request</code> is the 
-              data the requester sent, and <code>reply</code> is a function that the revice handler invokes once handling is done.</li>
+<li><code>request</code> - emitted when a request is received from a requester. The event handler should have the form <code>(request, reply)</code>, where <code>request</code> is the data the requester sent, and <code>reply</code> is a function that the service handler invokes once handling is done. It is also possible to call <code>reply.createWriteStream()</code> to stream the reply back to the requester.</li>
 <li><code>error</code> - emitted when an error occurs. The listener callback receives the error.</li>
 </ul>
 <h2 id="publishsubscribe">Publish/Subscribe<a class="headerlink" href="#publishsubscribe" title="Permanent link"></a></h2>
