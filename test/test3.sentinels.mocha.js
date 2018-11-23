@@ -225,7 +225,12 @@ describe('BusMQ sentinels', function() {
 
     it('should receive a request and return multiple replies', function(done) {
       var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: redisUrls, logger: console});
-      tf.serviceServesRequesterPushesIntermediateReply(bus,done);
+      tf.serviceServesRequesterPushesPartialReply(bus,done);
+    });
+
+    it('should receive a request and stream the response', function(done) {
+      var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: redisUrls, logger: console});
+      tf.serviceServesRequesterStreamsReply(bus,done);
     });
 
     it('should handle a request without returning a reply', function(done) {
@@ -233,7 +238,7 @@ describe('BusMQ sentinels', function() {
       tf.serviceServesRequesterPushesNoReply(bus,done);
     });
 
-    it.only('should return timeout error on request timeout', function(done) {
+    it('should return timeout error on request timeout', function(done) {
       var bus = Bus.create({driver: 'ioredis', layout: 'sentinels', redis: redisUrls, logger: console});
       tf.serviceRequestTimeout(bus,done);
     });

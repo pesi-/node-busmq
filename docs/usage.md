@@ -645,7 +645,9 @@ A service endpoint for implementing microservice architectures.
 A service object can either be serving requests or making requests, but it can't do both.
 
 Requests to a service have the request/response form - a requester sends a request to the service, the service
-handles the request and then sends a reply (or error) back to the requester.
+handles the request and then sends a reply (or error) back to the requester. 
+
+Replies can be streamed instead of sending them as a single response. This is useful in cases where the respose is large.
 
 Any number of service objects can handle requests, as well as any mumber of clients 
 can make requests to the service. When there are multiple service objects serving the same service enpoint,
@@ -666,10 +668,23 @@ bus.on('online', function() {
   requester.connect(function() {
     console.log('connected to the service');
   });
+
   // make a request and receive a reply
   requester.request({hello: 'world'}, function(err, reply) {
     console.log('the service replied with ' + reply.thisis);
   });
+
+  // make a request and receive a streaming reply
+  requester.request({hello: 'world'}, {streamReply: true}, function(err, reply) {
+    // reply is a Readable stream
+    reply.on("data", function(data) {
+      console.log('the service replied with ' + data.thisis);
+    });
+    reply.on("end", function() {
+      // no more data in the reply
+    });
+  });
+
   // this request does not have a reply
   requester.request({hello: 'again'});
 });
@@ -684,12 +699,25 @@ var bus = Bus.create({redis: ['redis://127.0.0.1:6379']});
 bus.on('online', function() {
   // create a service object to handle requests
   var handler = bus.service('foo');
+
   // handle requests
   handler.on('request', function(request, reply) {
     console.log('Hey! a new request just got in: ' + request.hello);
     // send the reply back to the requester
     reply(null, {thisis: 'my reply'});
   });
+
+  // handle requests with a streaming response
+  handler.on('request', function(request, reply) {
+    console.log('Hey! a new request just got in: ' + request.hello);
+    // stream the reply back to the requester
+    var st = reply.createWriteStream();
+    st.write({thisis: 'a first chunk'});
+    st.write({thisis: 'another chunk'});
+    st.write({thisis: 'last one!'});
+    st.end();
+  });
+
   // start serving requests
   handler.serve(function() {
     console.log('serving. requests will soon start flowing in...');
@@ -734,6 +762,7 @@ Make a request to the service. The `connect()` method must be called before maki
 * `data` - the request data to send to the service. Can be a string or an object.
 * `options` - request options:
   * `reqTimeout` - request timeout, overriding the default request timeout
+  * `streamReply` - the `reply` received in the callback will be a [Readable stream](https://nodejs.org/api/stream.html#stream_class_stream_readable) instead of the actual response.
 * `callback` - a callback of the form `function(err, reply)` that will be invoked with the reply from the service. 
                If ommitted, no reply will be sent (or received) from the service.
 
@@ -751,8 +780,7 @@ var service = bus.service('foo').promisify();
 * `serving` - emitted when the service will start receiving `request` events
 * `connected` - emitted once connected to the service as a consumer
 * `disconnect` - emitted when disconnected from the service
-* `request` - emitted when a request is received from a requester. The event handler should have the form `(request, reply)`, where `request` is the 
-              data the requester sent, and `reply` is a function that the revice handler invokes once handling is done.
+* `request` - emitted when a request is received from a requester. The event handler should have the form `(request, reply)`, where `request` is the data the requester sent, and `reply` is a function that the service handler invokes once handling is done. It is also possible to call `reply.createWriteStream()` to stream the reply back to the requester.
 * `error` - emitted when an error occurs. The listener callback receives the error.
 
 ## Publish/Subscribe

@@ -2233,9 +2233,9 @@ module.exports.serviceServesRequesterPushes = function(bus, done) {
   bus.connect();
 };
 
-module.exports.serviceServesRequesterPushesIntermediateReply = function(bus, done) {
+module.exports.serviceServesRequesterPushesPartialReply = function(bus, done) {
   var testRequest = { hello: "world" };
-  var testReplyIntermediate = { hi: "there" };
+  var testReplyPartial = { hi: "there" };
   var testReply = { bye: "now" };
 
   bus.on("error", done);
@@ -2250,7 +2250,7 @@ module.exports.serviceServesRequesterPushesIntermediateReply = function(bus, don
       Should(typeof reply).be.exactly("function");
       Should(reply.replyTo).not.be.null;
       request.hello.should.be.exactly(testRequest.hello);
-      reply(null, testReplyIntermediate, true);
+      reply(null, testReplyPartial, true);
       reply(null, testReply);
     });
     s.on("disconnect", function() {
@@ -2262,12 +2262,12 @@ module.exports.serviceServesRequesterPushesIntermediateReply = function(bus, don
           s.disconnect();
       });
       r.connect(function() {
-        r.request(testRequest, { allowIntermediateReply: true }, function(err, reply, intermediateReply) {
+        r.request(testRequest, { allowPartial: true }, function(err, reply, partial) {
           Should(err).be.exactly(null);
           Should(reply).not.be.null;
-          Should(intermediateReply).not.be.undefined;
-          if (intermediateReply) {
-            reply.hi.should.be.exactly(testReplyIntermediate.hi);
+          Should(partial).not.be.undefined;
+          if (partial) {
+            reply.hi.should.be.exactly(testReplyPartial.hi);
           } else {
             reply.bye.should.be.exactly(testReply.bye);
             r.disconnect();
@@ -2280,6 +2280,58 @@ module.exports.serviceServesRequesterPushesIntermediateReply = function(bus, don
   bus.on("offline", done);
   bus.connect();
 };
+
+module.exports.serviceServesRequesterStreamsReply = function(bus, done) {
+  var testRequest = { hello: "world" };
+  var testMessages = [{ msg: "hi0" },{ msg: "hi1" },{ msg: "hi2" },{ msg: "last" }];
+
+  bus.on("error", done);
+  bus.on("online", function() {
+    var sName = "test" + Math.random();
+    var s = bus.service(sName);
+    var r = bus.service(sName);
+
+    s.on("error", done);
+    s.on("request", function(request, reply) {
+      Should(request).not.be.null;
+      Should(typeof reply).be.exactly("function");
+      Should(reply.replyTo).not.be.null;
+      request.hello.should.be.exactly(testRequest.hello);
+      var st = reply.createWriteStream();
+      testMessages.forEach(function(msg) {
+        st.write(msg);
+      });
+      st.end();
+    });
+    s.on("disconnect", function() {
+      bus.disconnect();
+    });
+    s.on("serving", function() {
+      r.on("error", done);
+      r.on("disconnect", function() {
+          s.disconnect();
+      });
+      r.connect(function() {
+        var count = 0;
+        r.request(testRequest, { streamReply: true }, function(err, reply) {
+          Should(err).be.exactly(null);
+          Should(reply).not.be.null;
+          reply.on("data", function(data) {
+            data.msg.should.be.exactly(testMessages[count++].msg);
+          });
+          reply.on("end", function() {
+            Should(count).be.exactly(testMessages.length);
+            r.disconnect();
+          });
+        });
+      });
+    });
+    s.serve();
+  });
+  bus.on("offline", done);
+  bus.connect();
+};
+
 
 module.exports.serviceServesRequesterPushesNoReply = function(bus, done) {
   var testRequest = { hello: "world" };
@@ -2387,7 +2439,7 @@ module.exports.serviceRequestConsumeMax = function(bus, done) {
 module.exports.serviceGracefulShutdown = function(bus, done) {
   var testRequest = { hello: "world" };
   var testReply = { hi: "there" };
-  var max = 50;
+  var max = 2;
   var requests = 0;
   var replies = 0;
 
