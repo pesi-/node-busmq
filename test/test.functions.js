@@ -460,6 +460,44 @@ module.exports.queueShouldExpire = function(bus, done) {
   bus.connect();
 };
 
+module.exports.queueMaxSize = function(bus, done) {
+  var testMessage = "test message";
+  var maxsize = 10;
+  var topush = 15;
+
+  bus.on("error", done);
+  bus.on("online", function() {
+    var qName = "test" + Math.random();
+    // create producer
+    var p = bus.queue(qName);
+    p.on("error", done);
+    p.on("detached", function() {
+      bus.disconnect();
+    });
+    p.on("attached", function() {
+      var count = 0;
+      for (var i = 0; i < topush; ++i) {
+        p.push(testMessage, function(err, resp) {
+          Should(err).be.exactly(null);
+          if (count >= maxsize) {
+            Should(resp).be.exactly(null);
+          } else {
+            Should(resp).not.be.exactly(null);
+          }
+          if (++count === topush) {
+            p.detach();
+          }
+        });
+      }
+    });
+    p.attach({ ttl: 1, maxsize: maxsize });
+  });
+  bus.on("offline", function() {
+    done();
+  });
+  bus.connect();
+};
+
 module.exports.queueShouldBeFoundLocally = function(bus, done) {
   bus.on("error", done);
   bus.on("online", function() {

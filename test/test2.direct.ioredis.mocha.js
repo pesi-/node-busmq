@@ -110,6 +110,11 @@ describe('BusMQ direct connectivity using ioredis', function() {
         tf.queueShouldExpire(bus,done);
       });
   
+      it('queue with max size', function(done) {
+        var bus = Bus.create({driver: 'ioredis', redis: redisUrls, logger: console});
+        tf.queueMaxSize(bus, done);
+      });
+
       it('produces and consumes 10 messages in 10 queues', function(done) {
         var bus = Bus.create({driver: 'ioredis', redis: redisUrls, logger: console});
         tf.testManyMessages(bus, 10, 10, done);

@@ -5,6 +5,17 @@
 -- ARGV[1] - the message to push
 -- ARGV[2] - the ttl of the queue
 -- ARGV[3] - the message available channel to publish on
+-- ARGV[4] - maximum size of the queue to allow
+
+-- check that the size of the queue does not exceed maxsize
+-- if maxsize is 0 then the queue size is unlimited
+if ARGV[4] ~= '0' then
+  local maxsize = tonumber(ARGV[4])*2
+  local len = redis.call('llen', KEYS[2])
+  if maxsize <= len then
+    return nil
+  end
+end
 
 -- increment the message counter
 local id = redis.call('incr', KEYS[3])
