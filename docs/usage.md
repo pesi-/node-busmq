@@ -278,7 +278,9 @@ Once attached, the `attached` event is emitted.
 
 Options:
 
-* `ttl` - duration in seconds for the queue to live without any attachments. default is 30 seconds.
+* `ttl` - duration in seconds for the queue to live without any attached clients. default is 30 seconds.
+* `maxsize` - the maximum number of messages the queue can contain. pushing a message to a full queue results in the `push` callback being 
+              called with `id` set to `null`. default is 0 (unlimited).
 * `discoverable` - whether this queue should notify all the federating buses connected to this bus about this queue. 
                    finding a discoverable queue is performed using the `queue.find#` method. default is false.
 
