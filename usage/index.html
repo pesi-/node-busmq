@@ -322,7 +322,9 @@ q.consume({remove: false, index: 0});
 Once attached, the <code>attached</code> event is emitted.</p>
 <p>Options:</p>
 <ul>
-<li><code>ttl</code> - duration in seconds for the queue to live without any attachments. default is 30 seconds.</li>
+<li><code>ttl</code> - duration in seconds for the queue to live without any attached clients. default is 30 seconds.</li>
+<li><code>maxsize</code> - the maximum number of messages the queue can contain. pushing a message to a full queue results in the <code>push</code> callback being 
+              called with <code>id</code> set to <code>null</code>. default is 0 (unlimited).</li>
 <li><code>discoverable</code> - whether this queue should notify all the federating buses connected to this bus about this queue. 
                    finding a discoverable queue is performed using the <code>queue.find#</code> method. default is false.</li>
 </ul>
