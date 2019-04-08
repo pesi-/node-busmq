@@ -32,7 +32,10 @@ describe('BusMQ direct connectivity using node-redis', function() {
 
   // stop all redis servers
   after(function(done) {
-    redisGroup.stop(function() {done();});
+    redisGroup.stop(function() {
+      done();
+      setTimeout(process.exit, 1000);
+    });
   });
 
   describe('bus connection', function() {

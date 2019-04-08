@@ -37,7 +37,10 @@ describe('BusMQ sentinels', function() {
   // stop all redis servers
   after(function(done) {
     redisSentinels2.stop(function() {
-      redisSentinels.stop(done);
+      redisSentinels.stop(function() {
+        done();
+        setTimeout(process.exit, 1000);
+      });
     });
   });
 

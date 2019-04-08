@@ -112,7 +112,7 @@ RedisHelper.prototype.open = function(args, done) {
 RedisHelper.prototype.slaveOf = function(port, callback) {
   var client = redis.createClient(this.port, '127.0.0.1');
   function cb() {
-    client.end();
+    client.end(false);
     callback();
   };
   if (port) {

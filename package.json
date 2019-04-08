@@ -29,8 +29,8 @@
     "delivery"
   ],
   "dependencies": {
-    "ioredis": "1.15.1",
-    "redis": "0.12.1"
+    "ioredis": "4.9.1",
+    "redis": "2.8.0"
   },
   "optionalDependencies": {
     "ws": "1.1.5",
@@ -38,10 +38,10 @@
     "@capriza/dnode": "1.2.3"
   },
   "devDependencies": {
-    "mocha": "2.4.5",
+    "browserify": "16.2.3",
+    "mocha": "6.1.1",
     "should": "4.0.4",
-    "browserify": "13.0.0",
-    "uglify-js": "2.6.2"
+    "uglify-js": "3.5.3"
   },
   "browser": {
     "./index.js": "./browser/index.js",
