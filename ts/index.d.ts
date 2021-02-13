@@ -316,6 +316,11 @@ export interface ConsumeOptions {
      * This behaves exactly like calling queue.ack with the last id before starting to consume. Default is 0.
      */
     last?: number;
+
+    /**
+     * The request timeout, overriding the default request timeout.
+     */
+    reqTimeout?: number;
 }
 
 /**
