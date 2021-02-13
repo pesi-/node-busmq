@@ -937,7 +937,7 @@ export class Service extends EventEmitter {
      * @param options - message consumption options (same as Queue#consume) for consuming incoming request messages.
      * @param callback - one time listener for the serving event.
      */
-    serve( options: ConsumeOptions, callback?: () => any);
+    serve( options?: ConsumeOptions, callback?: () => any);
 
     /**
      * Connect to the service to start making requests.
