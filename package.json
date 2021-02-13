@@ -62,7 +62,8 @@
     "busmq.js",
     "busmq.min.js",
     "lib",
-    "browser"
+    "browser",
+    "ts"
   ],
   "license": "MIT",
   "scripts": {
