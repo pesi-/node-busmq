@@ -19,15 +19,15 @@ export type LogLevel = "log" | "exception" | "fatal" | "error" | "warning" | "wa
  * Specifies the interface a logger has to implement to be usable with busmq.
  */
 export interface Logger {
-    log(message : string);
-    exception?(message : string);
-    fatal?(message : string);
-    error?(message : string);
-    warning?(message : string);
-    warn?(message : string);
-    info?(message : string);
-    debug?(message : string);
-    trace?(message : string);
+    log(message : string): void;
+    exception?(message : string): void;
+    fatal?(message : string): void;
+    error?(message : string): void;
+    warning?(message : string): void;
+    warn?(message : string): void;
+    info?(message : string): void;
+    debug?(message : string): void;
+    trace?(message : string): void;
 }
 
 /**
@@ -153,7 +153,7 @@ export class Bus extends EventEmitter {
      * Once connected to all redis instances, the online event will be emitted.
      * If the bus gets disconnected from the the redis instances, the offline event will be emitted.
      */
-    connect();
+    connect(): void;
 
     /**
      * Returns whether the bus is online or not;
@@ -163,7 +163,7 @@ export class Bus extends EventEmitter {
     /**
      * Disconnect all redis connections, close the fedserver and close all the wspool websocket connections.
      */
-    disconnect();
+    disconnect() : void;
 
     /**
      * Provide a connection to redis for the specified key.
@@ -172,7 +172,7 @@ export class Bus extends EventEmitter {
      * @param key - the key to get the connection for. If not specified, return the first connection.
      * @param cb - callback of the form function(connection). Note that the provided connection object exposes redis commands directly.
      */
-    connection(key: string, cb?: (connection: Connection) => any);
+    connection(key: string, cb?: (connection: Connection) => any) : any;
 
     /**
      * Create a new Queue.
@@ -242,7 +242,7 @@ export class Connection extends EventEmitter {
      * @param index - the index of the connection within the hosting bus.
      * @param bus - the bus object using the connection.
      */
-    constructor(index, bus : Bus);
+    constructor(index : number, bus : Bus);
 
     /**
      * Returns true if both redis connections are ready.
@@ -252,12 +252,12 @@ export class Connection extends EventEmitter {
     /**
      * Connects to redis.
      */
-    connect();
+    connect(): void;
 
     /**
      * Disconnect from redis. Ends all redis connections.
      */
-    disconnect();
+    disconnect(): void;
 }
 
 /**
@@ -364,7 +364,7 @@ export class Queue extends EventEmitter {
      *
      * @param options - the options to use.
      */
-    attach(options : QueueOptions);
+    attach(options : QueueOptions): void;
 
     /**
      * Detach from the queue. The queue will continue to live for as long as it has at least one attachment.
@@ -374,7 +374,7 @@ export class Queue extends EventEmitter {
      *    detached - detached from the queue
      *    error    - some error occurred
      */
-    detach();
+    detach(): void;
 
     /**
      * Push a message to the queue. The message can be a JSON object or a string.
@@ -382,7 +382,7 @@ export class Queue extends EventEmitter {
      * @param message - the message to push.
      * @param callback  - invoked after the message was actually pushed to the queue. Receives err and the id of the pushed message.
      */
-    push(message: object | string, callback?: (err: string, resp: any) => any );
+    push(message: object | string, callback?: (err: string, resp: any) => any ): void;
 
     /**
      * Start consuming messages from the queue. The message event is emitted whenever a message is consumed from the queue.
@@ -395,7 +395,7 @@ export class Queue extends EventEmitter {
      *
      * @param options
      */
-    consume(options : ConsumeOptions);
+    consume(options : ConsumeOptions): void;
 
     /**
      * Specifies that the message with the specified id, and all messages with lower id's, can safely be discarded so that they should never be consumed again.
@@ -403,13 +403,13 @@ export class Queue extends EventEmitter {
      * @param id - the message id to ack
      * @param callback - invoked after the message was actually acked. receives err.
      */
-    ack(id : number, callback?: (err: string) => any);
+    ack(id : number, callback?: (err: string) => any) : void;
 
     /**
      * Returns true if this client is consuming messages, false otherwise.
      * @param callback - receives err and the consuming state
      */
-    isConsuming(callback?: (err: string, isConsuming: boolean) => any);
+    isConsuming(callback?: (err: string, isConsuming: boolean) => any) : boolean;
 
     /**
      * Stop consuming messages from the queue.
@@ -418,7 +418,7 @@ export class Queue extends EventEmitter {
      *    consuming - the new consuming state, which will be false when no longer consuming
      *    error     - on some error
      */
-    stop();
+    stop(): void;
 
     /**
      * Closes the queue and destroys all pending messages. No more messages can be pushed or consumed.
@@ -428,19 +428,19 @@ export class Queue extends EventEmitter {
      *    error  - some error occurred
      *    closed - the queue was closed
      */
-    close();
+    close(): void;
 
     /**
      * Empty the queue, removing all messages.
      * @param callback - invoked after the queue was flushed. receives err.
      */
-    flush(callback?: (err: string, resp: any) => any);
+    flush(callback?: (err: string, resp: any) => any) : void;
 
     /**
      * Checks if the queue exists in the local bus.
      * @param callback  - receives err and result with a value of true if the queue exists, false otherwise
      */
-    exists(callback?: (err: string, exists: boolean) => any);
+    exists(callback?: (err: string, exists: boolean) => any) : boolean;
 
     /**
      * Checks if the queue already exists in the local bus or a federated bus.
@@ -452,19 +452,19 @@ export class Queue extends EventEmitter {
      *                    If the queue exists in a federated bus, location will be set to the url of the federated bus.
      *                    If the queue is not found, location is set to null.
      */
-    find(callback?: (err: string, location: string) => any);
+    find(callback?: (err: string, location: string) => any) : any;
 
     /**
      * Get the number if messages in the queue.
      * @param callback - receives err and the number of messages in the queue.
      */
-    count(callback?: (err: string, count: number) => any);
+    count(callback?: (err: string, count: number) => any) : number;
 
     /**
      * Get the time in seconds for the queue to live without any clients attached to it.
      * @param callback - receives err and the ttl in seconds.
      */
-    ttl(callback?: (err: string, ttl: number) => any);
+    ttl(callback?: (err: string, ttl: number) => any) : number;
 
     /**
      * Get or set arbitrary metadata on the queue.
@@ -477,19 +477,19 @@ export class Queue extends EventEmitter {
      *                   If setting a metadata value, it is called with no further arguments.
      *                   If retrieving the value, it is called with the retrieved value.
      */
-    metadata( key: string, value?: any, callback?: (err: string, value?: any) => any);
+    metadata( key: string, value?: any, callback?: (err: string, value?: any) => any) : any;
 
     /**
      * Returns the number of messages pushed by this client to the queue.
      * @param callback - receives err and the number of pushed messages.
      */
-    pushed(callback?: (err: string, count: number) => any);
+    pushed(callback?: (err: string, count: number) => any) : number;
 
     /**
      * Returns the number of messages consumed by this client from the queue.
      * @param callback - receives err and the number of consumed messages.
      */
-    consumed(callback?: (err: string, count: number) => any);
+    consumed(callback?: (err: string, count: number) => any) : number;
 
     /**
      * Convert the eligible methods to promise based methods instead of callback based.
@@ -534,7 +534,7 @@ export class PromisifiedQueue extends EventEmitter {
      *
      * @param options - the options to use.
      */
-    attach(options : QueueOptions);
+    attach(options : QueueOptions): void;
 
     /**
      * Detach from the queue. The queue will continue to live for as long as it has at least one attachment.
@@ -544,7 +544,7 @@ export class PromisifiedQueue extends EventEmitter {
      *    detached - detached from the queue
      *    error    - some error occurred
      */
-    detach();
+    detach(): void;
 
     /**
      * Push a message to the queue. The message can be a JSON object or a string.
@@ -565,7 +565,7 @@ export class PromisifiedQueue extends EventEmitter {
      *
      * @param options
      */
-    consume(options : ConsumeOptions);
+    consume(options : ConsumeOptions): void;
 
     /**
      * Specifies that the message with the specified id, and all messages with lower id's, can safely be discarded so that they should never be consumed again.
@@ -578,7 +578,7 @@ export class PromisifiedQueue extends EventEmitter {
      * Returns true if this client is consuming messages, false otherwise.
      * @param callback - receives err and the consuming state
      */
-    isConsuming(callback?: (err: string, isConsuming: boolean) => any);
+    isConsuming(callback?: (err: string, isConsuming: boolean) => any): boolean;
 
     /**
      * Stop consuming messages from the queue.
@@ -587,7 +587,7 @@ export class PromisifiedQueue extends EventEmitter {
      *    consuming - the new consuming state, which will be false when no longer consuming
      *    error     - on some error
      */
-    stop();
+    stop(): void;
 
     /**
      * Closes the queue and destroys all pending messages. No more messages can be pushed or consumed.
@@ -597,7 +597,7 @@ export class PromisifiedQueue extends EventEmitter {
      *    error  - some error occurred
      *    closed - the queue was closed
      */
-    close();
+    close(): void;
 
     /**
      * Empty the queue, removing all messages.
@@ -688,20 +688,20 @@ export class Channel extends EventEmitter {
      * Connect to the channel, using the 'local' role to consume messages and 'remote' role to send messages.
      * @param options - message consumption options (same as Queue#consume)
      */
-    connect(options: ConsumeOptions);
+    connect(options: ConsumeOptions): void;
 
     /**
      * Alias to channel.connect()
      * @param options - message consumption options (same as Queue#consume)
      */
-    attach(options: ConsumeOptions);
+    attach(options: ConsumeOptions): void;
 
     /**
      * Connect to the channel as a "listener", using the 'local' role to send messages and 'remote' role to consume
      * messages. This is just a syntactic-sugar for a connect with a reverse semantic of the local/remote roles.
      * @param options - message consumption options (same as Queue#consume)
      */
-    listen(options: ConsumeOptions);
+    listen(options: ConsumeOptions): void;
 
     /**
      * Send a message to the peer. The peer does need to be connected for a message to be sent.
@@ -709,7 +709,7 @@ export class Channel extends EventEmitter {
      * @param message  - the message to push.
      * @param callback - invoked after the message was actually pushed to the queue. Receives err and the id of the pushed message.
      */
-    send(message: object | string, callback?: (err:string, resp: any) => any);
+    send(message: object | string, callback?: (err:string, resp: any) => any): void;
 
     /**
      * Send a message to the the specified endpoint. There is no need to connect to the channel with channel.connect or channel.listen.
@@ -718,24 +718,24 @@ export class Channel extends EventEmitter {
      * @param message  - the message to push.
      * @param callback - invoked after the message was actually pushed to the queue. Receives err and the id of the pushed message.
      */
-    sendTo(endpoint, message: object | string, callback?: (err:string, resp: any) => any);
+    sendTo(endpoint : any, message: object | string, callback?: (err:string, resp: any) => any): void;
 
     /**
      * Disconnect this endpoint from the channel without sending the 'end' event to the remote endpoint.
      * The channel remains open and a different peer can connect to it.
      */
-    disconnect();
+    disconnect() : void;
 
     /**
      * Alias to channel.disconnect()
      */
-    detach();
+    detach(): void;
 
     /**
      * End the channel. No more messages can be pushed or consumed.
      * This also causes the peer to disconnect from the channel and close the message queues.
      */
-    end();
+    end(): void;
 
     /**
      * Specifies that the message with the specified id, and all messages with lower id's, can safely be discarded so that they should never be consumed again.
@@ -743,12 +743,12 @@ export class Channel extends EventEmitter {
      * @param id - the message id to ack
      * @param callback - invoked after the message was actually acked. receives err.
      */
-    ack(id : number, callback?: (err: string) => any);
+    ack(id : number, callback?: (err: string) => any): void;
 
     /**
      * Returns true if connected to the channel, false if not connected.
      */
-    isAttached();
+    isAttached(): boolean;
 
     /**
      * Convert the eligible methods to promise based methods instead of callback based.
@@ -785,20 +785,20 @@ export class PromisifiedChannel extends EventEmitter {
      * Connect to the channel, using the 'local' role to consume messages and 'remote' role to send messages.
      * @param options - message consumption options (same as Queue#consume)
      */
-    connect(options: ConsumeOptions);
+    connect(options: ConsumeOptions): void;
 
     /**
      * Alias to channel.connect()
      * @param options - message consumption options (same as Queue#consume)
      */
-    attach(options: ConsumeOptions);
+    attach(options: ConsumeOptions): void;
 
     /**
      * Connect to the channel as a "listener", using the 'local' role to send messages and 'remote' role to consume
      * messages. This is just a syntactic-sugar for a connect with a reverse semantic of the local/remote roles.
      * @param options - message consumption options (same as Queue#consume)
      */
-    listen(options: ConsumeOptions);
+    listen(options: ConsumeOptions): void;
 
     /**
      * Send a message to the peer. The peer does need to be connected for a message to be sent.
@@ -815,24 +815,24 @@ export class PromisifiedChannel extends EventEmitter {
      * @param message  - the message to push.
      * @returns the id of the pushed message.
      */
-    sendTo(endpoint, message: object | string) : Promise<any>;
+    sendTo(endpoint : any, message: object | string) : Promise<any>;
 
     /**
      * Disconnect this endpoint from the channel without sending the 'end' event to the remote endpoint.
      * The channel remains open and a different peer can connect to it.
      */
-    disconnect();
+    disconnect(): void;
 
     /**
      * Alias to channel.disconnect()
      */
-    detach();
+    detach(): void;
 
     /**
      * End the channel. No more messages can be pushed or consumed.
      * This also causes the peer to disconnect from the channel and close the message queues.
      */
-    end();
+    end(): void;
 
     /**
      * Specifies that the message with the specified id, and all messages with lower id's, can safely be discarded so that they should never be consumed again.
@@ -844,7 +844,7 @@ export class PromisifiedChannel extends EventEmitter {
     /**
      * Returns true if connected to the channel, false if not connected.
      */
-    isAttached();
+    isAttached(): boolean;
 
     /**
      * Convert the eligible methods to promise based methods instead of callback based.
@@ -864,7 +864,7 @@ export interface IPersistable extends EventEmitter {
      *
      * @param callback - called when the save has finished. receives err if there was an error.
      */
-    save(callback?: (err:string) => any);
+    save(callback?: (err:string) => any): void;
 
     /**
      * Load all the tracked properties. All properties are marked as not dirty after the load completes.
@@ -874,19 +874,19 @@ export interface IPersistable extends EventEmitter {
      *                   where exists is true if the persisted object was found in the bus
      *                   and id is the id of the object whose data was searched.
      */
-    load(callback?: (err:string, exists: boolean, key: string) => any);
+    load(callback?: (err:string, exists: boolean, key: string) => any): void;
 
     /**
      * Start a periodic timer to continuously mark the persisted object as being used.
      *
      * @param ttl - specifies the number of seconds to keep the object alive in the bus.
      */
-    persist(ttl: number);
+    persist(ttl: number): void;
 
     /**
      * Stop the periodic timer. This will cause object to expire after the defined ttl provided in the persist method.
      */
-    unpersist();
+    unpersist(): void;
 }
 
 export class ServiceRequestOptions {
@@ -937,7 +937,7 @@ export class Service extends EventEmitter {
      * @param options - message consumption options (same as Queue#consume) for consuming incoming request messages.
      * @param callback - one time listener for the serving event.
      */
-    serve( options?: ConsumeOptions, callback?: () => any);
+    serve( options?: ConsumeOptions, callback?: () => any): void;
 
     /**
      * Connect to the service to start making requests.
@@ -946,7 +946,7 @@ export class Service extends EventEmitter {
      *                + additional property "reqTimeout" to define default request timeout for all requests can be specified.
      * @param callback - one time listener for the connected event
      */
-    connect( options?: ConsumeOptions, callback?: () => any);
+    connect( options?: ConsumeOptions, callback?: () => any): void;
 
     /**
      * Disconnect from the service. This should be called by both a service provider and a service consumer.
@@ -954,7 +954,7 @@ export class Service extends EventEmitter {
      *
      * @param gracePeriod -  number of milliseconds to wait for any currently in-flight requests to finish handling.
      */
-    disconnect( gracePeriod?: number);
+    disconnect( gracePeriod?: number): void;
 
     /**
      * Make a request to the service. The connect() method must be called before making any requests.
@@ -964,7 +964,7 @@ export class Service extends EventEmitter {
      * @param callback - a callback of the form function(err, reply) that will be invoked with the reply from the service.
      *                  If omitted, no reply will be sent (or received) from the service.
      */
-    request(data : any, options?: ServiceRequestOptions , callback?: (err:string, reply: any) => any);
+    request(data : any, options?: ServiceRequestOptions , callback?: (err:string, reply: any) => any): void;
 
     /**
      * Convert the eligible methods to promise based methods instead of callback based.
@@ -1023,7 +1023,7 @@ export class PromisifiedService extends EventEmitter {
      *
      * @param gracePeriod -  number of milliseconds to wait for any currently in-flight requests to finish handling.
      */
-    disconnect( gracePeriod?: number);
+    disconnect( gracePeriod?: number): void;
 
     /**
      * Make a request to the service. The connect() method must be called before making any requests.
@@ -1065,17 +1065,17 @@ export class PubSub extends EventEmitter {
      *                   Receives err if there was an error.
      *                   note: starting from version 1.5.0, the callback no longer receives the number of subscribers that received the message.
      */
-    publish(message : any, callback?: (err: string) => any );
+    publish(message : any, callback?: (err: string) => any ): void;
 
     /**
      * Subscribes to message in the pubsub channel. Once a message is received, the message event will be emitted.
      */
-    subscribe();
+    subscribe(): void;
 
     /**
      * Unsubscribes from messages on the pubsub channel. Messages can still be published using the publish method.
      */
-    unsubscribe();
+    unsubscribe(): void;
 
     /**
      * Returns true if subscribed to messages from the pubsub channel, false if not.
@@ -1121,12 +1121,12 @@ export class PromisifiedPubSub extends EventEmitter {
     /**
      * Subscribes to message in the pubsub channel. Once a message is received, the message event will be emitted.
      */
-    subscribe();
+    subscribe() : void;
 
     /**
      * Unsubscribes from messages on the pubsub channel. Messages can still be published using the publish method.
      */
-    unsubscribe();
+    unsubscribe(): void;
 
     /**
      * Returns true if subscribed to messages from the pubsub channel, false if not.
@@ -1151,12 +1151,12 @@ export class WSPool extends EventEmitter {
      * @param url - the url to get the websocket for. if none is available right now it will be retrieved once one is available.
      * @param callback - receives the websocket channel.
      */
-    get(url : string, callback?: (err: string, channel: any) => any);
+    get(url : string, callback?: (err: string, channel: any) => any) : void;
 
     /**
      * Close the pool and disconnect all open websockets
      */
-    close();
+    close() : void;
 }
 
 /**
@@ -1195,7 +1195,7 @@ export class Federation extends EventEmitter {
      *
      * @param disconnect - true to disconnect the underlying websocket
      */
-    close(disconnect : boolean);
+    close(disconnect : boolean): void;
 }
 
 /**
